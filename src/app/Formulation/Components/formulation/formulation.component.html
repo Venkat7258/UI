@@ -1,0 +1,2005 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"><a [routerLink]="['/Dashboard']">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page"> <a (click)="navigateToFormulation()"
+            [routerLink]="['/Formulation']"> Formulations</a> </li>
+        <li *ngIf="!IsFormulation" class="breadcrumb-item active" aria-current="page">{{moduleNameBreadCum}}</li>
+      </ol>
+    </nav>
+    <div *ngIf="IsFormulation; then thentemplate else elsetemplate"></div>
+    <ng-template #thentemplate>
+      <div class="row">
+        <div class="col">
+          <div class="kendo-landing-grid">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex bd-highlight page_title_section">
+                  <div class="bd-highlight flex-left">
+                    <span> <em> Formulations </em> </span>
+                  </div>
+                  <div class="flex-grow-1 bd-highlight flex-left">
+                    <span></span>
+                  </div>
+                  <div class="bd-highlight">
+                    <span>
+                      <div class="form-check form-check-inline">
+                        <div class="grid-check-box-actions">
+                          <input class="form-check-input form-check-custom" type="checkbox"
+                            (change)="ShowInactiveFormulation($event)" id="" value="">
+                          <label class="form-check-label" for="inlineCheckbox1"> <span> <em>Show Inactive
+                                Formulations</em> </span></label>
+                        </div>
+                      </div>
+                      <button type="button" class="btn btn-outline-primary btn-radius" data-toggle="modal"
+                        *ngIf="rmmapi.getRolePrivilege('CF')" (click)="CloneFormulations(CloneFormulation)"
+                        [disabled]="!isCloneFormulationEnable">
+                        <i class="fa fa-clone"></i> Clone Formulation</button>
+                      <button type="button" class="btn btn-primary btn-radius" data-toggle="modal"
+                        *ngIf="rmmapi.getRolePrivilege('CF')" (click)="FormulationModal(Formulation)"> <i
+                          class="fa fa-plus"></i> Formulation</button>
+                    </span>
+                  </div>
+                </div>
+                <ng-template #template let-anchor>
+                  <span>{{ anchor.nativeElement.innerText }}</span>
+                </ng-template>
+                <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td th"  #tooltipReview="kendoTooltip"
+                  (mouseover)="showTooltip($event, tooltipReview)">
+                  <div class="tab-content" id="v-pills-tabContent" *ngIf="rmmapi.getRolePrivilege('FL')">
+                    <kendo-grid class="k-grid-custom child2" [data]="formulationList"
+                      *ngIf="rmmapi.getRolePrivilege('FL')" [pageable]="{
+                                        buttonCount: this.searchFilter.buttonCount,
+                                        info: true,
+                                        type: 'numeric',
+                                        pageSizes: [10,20,50,100,200],
+                                        previousNext: true,
+                                        position: 'bottom' }" [pageSize]="searchFilter.pageSize"
+                      [skip]="searchFilter.pageSkip" [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort"
+                      (sortChange)="sortChange($event)" (pageChange)="pageChange($event)"
+                      [selectable]="selectableSettings" (selectionChange)="onSelectedKeysChange($event)">
+                      <kendo-grid-checkbox-column width="80" title="Select">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="{{dataItem.IsRawMaterials === true ? 'k-disabled' : ''}}">
+                            <input [kendoGridSelectionCheckbox]="rowIndex" />
+                          </div>
+                        </ng-template>
+                      </kendo-grid-checkbox-column>
+                      <kendo-grid-column field="ProductName" title="Product Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="ProductCategoryName" title="Product Category" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="FormulationReferenceNo" title="Formulation Reference Number and Version"
+                        width="">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="k-grid-status-list">
+                            <div>
+                              {{dataItem.FormulationReferenceNoandVersionNo}}
+                            </div>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-grid-column field="MarketNames" title="Markets" width=""></kendo-grid-column>
+                      <kendo-grid-column field="StatusName" title="Status" width="">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <div class="k-grid-status-list">
+                            <div [class]="dataItem.StatusCode | TransformationStatuCodeColor : 'formulationList'  ">
+                              {{dataItem.StatusName}}
+                            </div>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                      <kendo-grid-column title="Actions" width="125">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list">
+                            <button *ngIf="rmmapi.getRolePrivilege('MF') || rmmapi.getRolePrivilege('FV')"
+                              aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+                              [disabled]="dataItem.IsDeleted"
+                              (click)="EditFormulationDetailsInfo('View',Formulation,dataItem)"><span
+                                class="fa-edit"></span></button>
+                            <button *ngIf="rmmapi.getRolePrivilege('IF')"
+                              [attr.aria-label]="dataItem.IsDeleted ? 'Reactivate' : 'Inactivate'"
+                              data-balloon-pos="left" class="btn btn-sm btn-light "
+                              (click)="InActiveModalInfo(InActiveModal,dataItem,'Formulation')">
+                              <span
+                                [ngClass]="dataItem.IsDeleted ? 'fa-check btn-light' : 'fa-ban btn-light-danger'"></span></button>
+                            <button *ngIf="rmmapi.getRolePrivilege('FV')" aria-label="Versions"
+                              data-balloon-pos="left" class="btn btn-sm btn-light" [disabled]="dataItem.IsDeleted"
+                              (click)="OpenFormulationAllVersions(AllVersion,dataItem)"><span
+                                class="fa-version"></span></button>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                  </div>
+                </div>
+                <!-- <div *ngIf="isFGridLoading" class="k-i-loading"></div> -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+    <!-- FORMULATION TABS START & VIEW PAGE START-->
+    <ng-template #elsetemplate>
+      <div class="nav-tabs-custom">
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <a class="nav-link" [class.active]="moduleName=='VersionChangeDetails'" id="nav-home-tab" data-toggle="tab"
+              (click)="tabchange('VersionChangeDetails')" href="javascript:void(0)" role="tab" aria-controls="nav-home"
+              aria-selected="true">
+              <!-- <span class="badge badge-secondary">12</span> <--> <span> Version & Change Details </span>
+            </a>
+            <a class="nav-link" [class.active]="moduleName=='RawMaterials'" id="nav-profile-tab" data-toggle="tab"
+              href="javascript:void(0)" (click)="tabchange('RawMaterials')" role="tab" aria-controls="nav-profile"
+              aria-selected="false">
+              <span> Raw Materials </span>
+            </a>
+            <a class="nav-link" [class.active]="moduleName=='MarketRegulations'"
+              (click)="tabchange('MarketRegulations')" id="nav-contact-tab" data-toggle="tab" href="javascript:void(0)"
+              role="tab" aria-controls="nav-contact" aria-selected="false">
+              <span> Market Regulations </span>
+            </a>
+            <a class="nav-link" [class.active]="moduleName=='DataDocumentCheck'"
+              (click)="tabchange('DataDocumentCheck')" id="nav-contact-tab" data-toggle="tab" href="javascript:void(0)"
+              role="tab" aria-controls="nav-contact" aria-selected="false">
+              <span> Data & Documents Check </span>
+            </a>
+            <a class="nav-link" [class.active]="moduleName=='FormulationTranscriptSummary'"
+              (click)="tabchange('FormulationTranscriptSummary')" id="nav-contact-tab" data-toggle="tab"
+              href="javascript:void(0)" role="tab" aria-controls="nav-contact" aria-selected="false">
+              <span> Formulation Summary</span>
+            </a>
+            <a class="nav-link" [class.active]="moduleName=='IngredientListINCIBreakdown'"
+              (click)="tabchange('IngredientListINCIBreakdown')" id="nav-contact-tab" data-toggle="tab"
+              href="javascript:void(0)" role="tab" aria-controls="nav-contact" aria-selected="false">
+              <!-- <span class="badge badge-secondary">39</span> <--> <span> Ingredient List
+              </span>
+            </a>
+            <a class="nav-link" [class.active]="moduleName=='DocumentTraking'" (click)="tabchange('DocumentTraking')"
+              id="nav-contact-tab" data-toggle="tab" href="javascript:void(0)" role="tab" aria-controls="nav-contact"
+              aria-selected="false">
+              <span> Document Tracking </span>
+            </a>
+          </div>
+        </nav>
+      </div>
+      <span class="comments" data-toggle="modal" data-target="#myModal" (click)="ViewCommentsGrid(ViewCommentModel)"> <i
+          class="fa fa-comments-o"></i> Comments </span>
+      <!-- VIEW PAGE START -->
+      <div class="nav_tabs_section">
+        <div class="tab-content" id="nav-tabContent">
+          <div class="tab-pane fade show active" [class.show]="moduleName=='VersionChangeDetails'" id="nav-tab1"
+            role="tabpanel" aria-labelledby="nav-home-tab">
+            <ng-container *ngIf="moduleName=='VersionChangeDetails'">
+              <div class="formulation-card-body-vh">
+                <div class="view-panel">
+                  <div class="row">
+                    <div class="col">
+                      <div class="content-grid">
+                        <div class="card">
+                          <div class="card-body">
+                            <div class="d-flex bd-highlight page_title_section">
+                              <div class="bd-highlight flex-left">
+                                <span> <em> Version & Change Details </em> </span>
+                              </div>
+                              <div class="flex-grow-1 bd-highlight flex-left">
+                                <span> </span>
+                              </div>
+                              <div class="bd-highlight">
+                                <a class="m-r-10" href="#" data-toggle="modal" data-target="#myModal"
+                                  (click)="OpenAllVersions(AllVersion)"> All versions </a>
+                                <!-- <button type="button" [disabled]="!AccessToMF" (click)="UpdateFormulationInfo()"
+                                      class="btn btn-primary btn-radius btn-radius m-l-10"> {{ actionType ? 'Save' :"Update"
+                                      }}</button> -->
+                                <button type="button" class="btn btn-outline-primary btn-radius m-l-10"
+                                  (click)="tabchange('RawMaterials')"> <i class="fa fa-long-arrow-right"></i> Next
+                                </button>
+                              </div>
+                            </div>
+
+                            <form id="frm_FormulationVersionform" name="form" #FormulationVersionform="ngForm"
+                              (ngSubmit)="FormulationVersionform.form.valid && UpdateFormulationInfo()">
+                              <div class="version-change-details-vh p-md-4">
+                                <div class="form-group view-form-group">
+                                  <div class="view-item">
+                                    <div class="row">
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span><em> Product Name </em></span></label>
+                                          <span class="">{{formulationInfoModel.ProductName}}</span>
+                                        </div>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span> <em> Product Category </em> </span></label>
+                                        </div>
+                                        <span class="">{{formulationInfoModel.ProductCategoryName}}</span>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span> <em> Formulation Reference Number </em></span></label>
+                                        </div>
+                                        <span class="">{{formulationInfoModel.FormulationReferenceNo}}</span>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label ">
+                                          <label class="" for=""><span><em>Version Number</em> </span></label>
+                                        </div>
+                                        <span class="">{{formulationInfoModel.VersionNo}}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="form-group view-form-group">
+                                  <div class="view-item">
+                                    <div class="row">
+                                      <div class="col-6">
+                                        <div class="combo-label">
+                                          <div class="row-tooltip">
+                                            <div class="custom-help-text bottom"> Multiple Markets can be selected </div>
+                                          </div>
+                                          
+                                          <label for=""> <span><em>Markets <span class="mandatory"></span> <span class="info_circle getInfo"></span> </em></span></label>
+                                          <div class="CancelEditBtn">
+                                            <button type="button" class="btn btn-link pl-0"
+                                              [hidden]="HideMarketCancelBtn" (click)="CancelAddMarketsInfo();"
+                                              data-toggle="modal"> Cancel</button>
+                                            <button type="button" class="btn btn-link" [hidden]="HideMarketEditBtn"
+                                              data-toggle="modal"
+                                              (click)="FormulationRadioDivModal(FormulationRadioDiv)"
+                                              *ngIf="rmmapi.getRolePrivilege('MF')">
+                                              Edit</button>
+                                          </div>
+                                        </div>
+                                        <kendo-multiselect [readonly]='!AccessToMF' [disabled]="DisableMarkets"
+                                          [data]="allMarkets" class="kendo_custom_dropdown kendo_custom_multiselect"
+                                          textField="Name" valueField="Id" [kendoDropDownFilter]="filterSettings"
+                                          [(ngModel)]="formulationInfoModel.Markets" name="Markets" #Markets="ngModel"
+                                          [ngClass]="{ 'is-invalid': FormulationVersionform.submitted && Markets.invalid }"
+                                          required>
+                                        </kendo-multiselect>
+                                        <div *ngIf="FormulationVersionform.submitted && Markets.invalid"
+                                          class="invalid-feedback">
+                                          <div *ngIf="Markets.errors.required">
+                                            {{env.ValidationMessages.requiredMultiSelectRawMaterialMsg}}</div>
+                                        </div>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""> <span><em> R & D Contact </em></span> </label>
+                                        </div>
+                                        <input type="text" appInputTrim [readonly]='!AccessToMF'
+                                          [attr.disabled]="formulationInfoModel.StatusCode === 'ILA'  || formulationInfoModel.StatusCode === 'FMC' ? true : null"
+                                          class="form-control" [(ngModel)]="formulationInfoModel.R_DContact"
+                                          placeholder="" name="R_DContact" maxlength="100">
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span><em>Project</em> </span></label>
+                                        </div>
+                                        <input type="text" appInputTrim [readonly]='!AccessToMF'
+                                          [attr.disabled]="formulationInfoModel.StatusCode === 'ILA'  || formulationInfoModel.StatusCode === 'FMC' ? true: null"
+                                          class="form-control" [(ngModel)]="formulationInfoModel.Project" placeholder=""
+                                          name="Project" maxlength="100">
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="form-group view-form-group">
+                                  <div class="view-item">
+                                    <div class="row">
+                                      <div class="col-12">
+                                        <div class="combo-label">
+                                          <label for=""><span><em>Reason for Change</em></span></label>
+                                        </div>
+                                        <textarea type="text" appInputTrim [readonly]='!AccessToMF'
+                                          [attr.disabled]="formulationInfoModel.StatusCode === 'ILA'  || formulationInfoModel.StatusCode === 'FMC' ? true: null"
+                                          class="form-control" [(ngModel)]="formulationInfoModel.ReasonForChange"
+                                          placeholder="" name="ReasonForChange" maxlength="500">  </textarea>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="form-group view-form-group">
+                                  <div class="view-item">
+                                    <div class="row">
+                                      <div class="col-3">
+                                        <label for="exampleInputPassword1"> Created Date </label>
+                                        <span class=""> {{formulationInfoModel.CreatedDate}}</span>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span><em>Created By </em> </span></label>
+                                        </div>
+                                        <span class=""> {{formulationInfoModel.CreatedBy}}</span>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span><em>Last Updated Date</em></span></label>
+                                        </div>
+                                        <span class=""> {{formulationInfoModel.UpdatedDate}}</span>
+                                      </div>
+                                      <div class="col-3">
+                                        <div class="combo-label">
+                                          <label for=""><span><em>Status</em></span></label>
+                                        </div>
+                                        <span class="">{{this.formulationInfoModel.StatusName}}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="text-center">
+                                  <button type="button" *ngIf="isCancelHide && AccessToMF"
+                                    (click)="ResetTheVersionDetailsChanges(AllVersion)" class="btn btn-outline-light btn-radius">
+                                    Cancel </button>
+                                  <button type="submit" [disabled]="DisableMarkets || !AccessToFV "
+                                    *ngIf="rmmapi.getRolePrivilege('MF')"
+                                    class="btn btn-primary btn-radius btn-radius m-l-10"> {{ actionType ? 'Save'
+                                    :"Update"}}</button>
+                                </div>
+                              </div>
+                            </form>
+                          </div>
+                        </div>
+                        <!-- <div *ngIf="isLoading" class="k-loading-mask k-i-loading"></div> -->
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+          <div class="tab-pane fade show active" [class.show]="moduleName=='RawMaterials'" id="nav-tab1" role="tabpanel"
+            aria-labelledby="nav-home-tab">
+            <ng-container *ngIf="moduleName=='RawMaterials'">
+              <app-formulation-raw-materials [formulationDetailId]="formulationInfoModel.Id"
+                (informToParent)="GotoNextTab('MarketRegulations')" [StatusCode]="formulationInfoModel.StatusCode">
+              </app-formulation-raw-materials>
+            </ng-container>
+          </div>
+          <div class="tab-pane fade show active" [class.show]="moduleName=='MarketRegulations'" id="nav-tab1"
+            role="tabpanel" aria-labelledby="nav-profile-tab">
+            <ng-container *ngIf="moduleName=='MarketRegulations'">
+              <app-market-regulations [formulationDetailId]="formulationInfoModel.Id"
+                (informToParent)="GotoNextTab('DataDocumentCheck')"></app-market-regulations>
+            </ng-container>
+          </div>
+          <div class="tab-pane fade show active" [class.show]="moduleName=='DataDocumentCheck'" id="nav-tab1"
+            role="tabpanel" aria-labelledby="nav-home-tab">
+            <ng-container *ngIf="moduleName=='DataDocumentCheck'">
+              <app-data-document-check [formulationDetail]="formulationInfoModel"
+                (informToParent)="GotoNextTab('FormulationTranscriptSummary')"></app-data-document-check>
+            </ng-container>
+          </div>
+          <div class="tab-pane fade show active" [class.show]="moduleName=='FormulationTranscriptSummary'" id="nav-tab1"
+            role="tabpanel" aria-labelledby="nav-home-tab">
+            <ng-container *ngIf="moduleName=='FormulationTranscriptSummary'">
+              <app-formulation-transcript-summary [formulationDetail]="formulationInfoModel"
+                (informToParent)="GotoNextTab('IngredientListINCIBreakdown')">
+              </app-formulation-transcript-summary>
+            </ng-container>
+          </div>
+          <div class="tab-pane fade show active" [class.show]="moduleName=='IngredientListINCIBreakdown'" id="nav-tab1"
+            role="tabpanel" aria-labelledby="nav-home-tab">
+            <ng-container *ngIf="moduleName=='IngredientListINCIBreakdown'">
+              <app-formulation-incibreakdown-list [formulationDetail]="formulationInfoModel"
+                (informToParent)="GotoNextTab('DocumentTraking')">
+              </app-formulation-incibreakdown-list>
+            </ng-container>
+          </div>
+          <div class="tab-pane fade show active" [class.show]="moduleName=='DocumentTraking'" id="nav-tab1"
+            role="tabpanel" aria-labelledby="nav-home-tab">
+            <ng-container *ngIf="moduleName=='DocumentTraking'">
+              <app-formulation-document-tracking [formulationDetail]="formulationInfoModel">
+              </app-formulation-document-tracking>
+            </ng-container>
+          </div>
+        </div>
+      </div>
+      <!-- VIEW PAGE END -->
+    </ng-template>
+    <!-- FORMULATION TABS END VIEW PAGE END -->
+  </div>
+</div>
+<ng-template #FormulationRadioDiv>
+  <div class="modal-header">
+    <h5 class="modal-title">Edit Markets and/or Market Regulations </h5>
+    <button type="button" class="close" (click)="CloseFormulation()">&times;</button>
+  </div>
+  <!-- Form starts -->
+  <form #myForm="ngForm" (submit)="AddMarketsInfo(myForm,Formulation)" novalidate>
+    <div class="modal-body">
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" value="new" type="radio" name="OldNew" ngModel id="flexRadioDefault1"
+          (change)="changeRadiobutton($event)">
+        <label class="form-check-label" for="flexRadioDefault1">
+          Create New Version
+        </label>
+      </div>
+      <div class="form-check form-check-inline">
+        <input class="form-check-input" value="old" type="radio" name="OldNew" ngModel id="flexRadioDefault2" checked
+          (change)="changeRadiobutton($event)">
+        <label class="form-check-label" for="flexRadioDefault2">
+          Update Existing Version
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-light btn-radius" (click)="CloseFormulation()">Cancel</button>
+      <button type="submit" class="btn btn-primary btn-radius" [disabled]="isVersionRadioButton">Ok</button>
+    </div>
+  </form><!-- Form ends -->
+</ng-template>
+<ng-template #Formulation let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h5 class="modal-title">{{ actionType ? ' Add Formulation' :" Edit Formulations" }} {{createVersionFormulation?"
+      Version":''}}</h5>
+    <button type="button" class="close" (click)="CloseFormulation(AllVersion)">&times;</button>
+  </div>
+  <form name="form" [formGroup]="formulationForm">
+    <div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputEmail1"><span><em> Product Name <span class="mandatory"></span>
+                    </em></span></label>
+              </div>
+              <kendo-dropdownlist class="kendo_custom_dropdown" [data]="allProductsInfo" textField="Name"
+                [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="false"
+                [(ngModel)]="formulationInfoModel.Products" formControlName="ProductName"
+                [readonly]="createVersionFormulation" (valueChange)="OnProductsChange($event,'formulation')" required>
+              </kendo-dropdownlist>
+              <div class="invalid-feedback"
+                *ngIf="formulationForm.controls.ProductName.errors?.required && formulationForm.controls.ProductName.touched">
+                This field is required.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputEmail1"><span><em>Product Category <span
+                      class="mandatory"></span></em></span></label>
+            </div>
+            <kendo-dropdownlist class="kendo_custom_dropdown" [data]="allProductCategoriesInfo" textField="Name"
+              valueField="Id" [valuePrimitive]="false" [(ngModel)]="formulationInfoModel.ProductCategories"
+              (valueChange)="GetFormulationVersions($event)" [defaultItem]="defaultItem"
+              formControlName="ProductCategory" required [readonly]="createVersionFormulation">
+            </kendo-dropdownlist>
+            <div class="invalid-feedback"
+              *ngIf="formulationForm.controls.ProductCategory.errors?.required && formulationForm.controls.ProductCategory.touched">
+              This field is required.
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputPassword1">
+                <span>
+                  <em>Formulation Reference Number
+                    <span class="mandatory"></span></em>
+                </span>
+              </label>
+            </div>
+            <input type="text" trim="blur" class="form-control"
+              [(ngModel)]="formulationInfoModel.FormulationReferenceNo" (blur)="IsCheckFormulationDetailsInfo()"
+              placeholder="" formControlName="FormulationReferenceNo" maxlength="50"
+              [readonly]="createVersionFormulation"
+              [ngClass]="{ 'is-invalid':  formulationForm.controls.FormulationReferenceNo.errors?.required && formulationForm.controls.FormulationReferenceNo.touched }"
+              required>
+            <div class="invalid-feedback"
+              *ngIf="formulationForm.controls.FormulationReferenceNo.errors?.required && formulationForm.controls.FormulationReferenceNo.touched">
+              This field is required.
+            </div>
+
+            <div class="invalid-feedback" *ngIf="IsCheckFormulationDetails">
+              {{env.ValidationMessages.Thisvaluealreadyexists}}
+            </div>
+
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-md-4 disableElementsss">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em> Version Number </em></span> </label>
+              </div>
+              <input type="text" appInputTrim class="form-control m-b-5" formControlName="VersionNo"
+                [attr.disabled]="true" [(ngModel)]="formulationInfoModel.VersionNo" placeholder="" required>
+              <div class="invalid-feedback"
+                *ngIf="formulationForm.controls.VersionNo.errors?.required && formulationForm.controls.VersionNo.touched">
+                This field is required.
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="Version" formControlName="Version" id="inlineRadio1"
+                  value="Major" (change)="VersionSelect('Major')" [(ngModel)]="selectedVersion">
+                <label class="form-check-label" for="inlineRadio1">Major Version</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="Version" formControlName="Version" id="inlineRadio2"
+                  value="Minor" (change)="VersionSelect('Minor')" [(ngModel)]="selectedVersion">
+                <label class="form-check-label" for="inlineRadio2">Minor Version</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" *ngIf="IsCopyRawMaterial">
+            <div class="form-group">
+              <label>&nbsp;</label>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="checkbox" formControlName="CheckCopyVersionFormulation"
+                  [(ngModel)]="CheckCopyVersionFormulation" (change)="CopyRawMaterialChange($event)" id="" value="">
+                <label class="form-check-label" for="inlineCheckbox1">Copy Raw Materials and Markets?</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4" *ngIf="isVersionDropdown">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em>Source Version Number </em></span>
+                  <div class="pull-right" *ngIf="!isFormulationDisable">
+                    <span (click)="CopyFormulationModal(CopyFormulation,Formulation)"> <a class="copy"> Copy </a>
+                    </span>
+                  </div>
+                </label>
+              </div>
+              <kendo-dropdownlist class="kendo_custom_dropdown" [disabled]="isFormulationDisable" [data]="listVersions"
+                (valueChange)="GetFormulationSourceVersions($event)" formControlName="listVersionNo"
+                [(ngModel)]="defaultVersion">
+              </kendo-dropdownlist>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="form-group">
+              <div class="combo-label">
+                <div class="row-tooltip">
+                  <div class="custom-help-text bottom"> Multiple Markets can be selected </div>
+                </div>
+                <label for="exampleInputPassword1"> <span><em> Markets <span class="mandatory"></span> <span class="info_circle getInfo"></span> </em></span>
+                </label>
+              </div>
+              <kendo-multiselect formControlName="Markets" [data]="allMarkets" [kendoDropDownFilter]="filterSettings"
+                class="kendo_custom_dropdown kendo_custom_multiselect" textField="Name" valueField="Id"
+                [(ngModel)]="formulationInfoModel.Markets" required>
+              </kendo-multiselect>
+              <div class="invalid-feedback"
+                *ngIf="formulationForm.controls.Markets.errors?.required && formulationForm.controls.Markets.touched">
+                At least one selection is required.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"> <span><em> R &amp; D Contact
+                    </em></span> </label>
+              </div>
+              <input type="text" appInputTrim class="form-control" formControlName="RDContact"
+                [(ngModel)]="formulationInfoModel.R_DContact" placeholder="" maxlength="100">
+
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"> <span><em>Project</em></span> </label>
+              </div>
+              <input type="text" appInputTrim class="form-control" formControlName="Project"
+                [(ngModel)]="formulationInfoModel.Project" placeholder="" maxlength="100">
+
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"> <span><em> Reason for Change </em>
+                  </span> </label>
+              </div>
+              <textarea type="text" appInputTrim class="form-control" formControlName="ReasonForChange"
+                [(ngModel)]="formulationInfoModel.ReasonForChange" placeholder="" maxlength="500"> </textarea>
+
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-radius"
+          (click)="CloseFormulation(AllVersion)">Cancel</button>
+        <button type="submit" (click)="AddFormulationInfo('Manage',AllVersion)"
+          class="btn btn-outline-primary btn-radius">Save & Manage
+        </button>
+        <button type="button" (click)="AddFormulationInfo('Save',AllVersion)"
+          class="btn btn-primary btn-save btn-radius">{{
+          actionType ?
+          'Save' :"Update" }}</button>
+      </div>
+    </div>
+    <!-- <div *ngIf="isLoading" class="k-loading-mask k-i-loading"></div> -->
+  </form>
+  <!-- Create Formulation END -->
+</ng-template>
+<ng-template #CloneFormulation let-modal>
+  <!-- Modal Header -->
+  <div>
+    <div class="modal-header">
+      <h5 class="modal-title">Clone Formulation</h5>
+      <button type="button" class="close" (click)="CloneFormulationClose(CloneFormulation)">&times;</button>
+    </div>
+    <div class="modal-body">
+      <!-- SOURCE FORMULATION VERSION START -->
+      <div class="row">
+        <div class="col-md-12">
+          <h6 class="m-b-10"> Source Formulation Version </h6>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputEmail1"><span><em>Product Name</em></span></label>
+            </div>
+            <kendo-dropdownlist class="kendo_custom_dropdown" [disabled]="true" [defaultItem]="defaultItem"
+              [data]="allProductsInfo" textField="Name" valueField="Id"
+              [(ngModel)]="cloneFormulationInfoModel.CloneProducts">
+            </kendo-dropdownlist>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputEmail1"><span><em>Product Category</em></span></label>
+            </div>
+            <kendo-dropdownlist class="kendo_custom_dropdown" [disabled]="true" [defaultItem]="defaultItem"
+              [data]="allProductCategoriesInfo" textField="Name" valueField="Id"
+              [(ngModel)]="cloneFormulationInfoModel.CloneProductCategories">
+            </kendo-dropdownlist>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"><span><em>Formulation Reference Number</em></span></label>
+            </div>
+            <input type="text" appInputTrim class="form-control" [disabled]="true"
+              [(ngModel)]="cloneFormulationInfoModel.CloneFormulationReferenceNo" placeholder="">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"><span><em>Version Number</em></span></label>
+            </div>
+            <input type="text" appInputTrim [disabled]="true" class="form-control m-b-5" [disabled]="true"
+              [(ngModel)]="cloneFormulationInfoModel.CloneVersionNo" placeholder="">
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="Version" id="inlineRadio1" value="Major"
+                (click)="VersionSelect('Major')" [checked]="checkversion" [disabled]="true">
+              <label class="form-check-label" for="inlineRadio1">Major Version</label>
+            </div>
+            <div class="form-check form-check-inline">
+              <input class="form-check-input" type="radio" name="Version" id="inlineRadio2" value="Minor"
+                (click)="VersionSelect('Minor')" [checked]='!checkversion' [disabled]="true">
+              <label class="form-check-label" for="inlineRadio2">Minor Version</label>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"><span><em>Markets</em></span> </label>
+            </div>
+            <kendo-multiselect [disabled]="true" [data]="allMarkets" [kendoDropDownFilter]="filterSettings"
+              class="kendo_custom_dropdown kendo_custom_multiselect" textField="Name" valueField="Id"
+              [(ngModel)]="cloneFormulationInfoModel.CloneMarkets">
+            </kendo-multiselect>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"> <span><em> R &amp; D Contact </em></span> </label>
+            </div>
+            <input type="text" appInputTrim [disabled]="true" class="form-control"
+              [(ngModel)]="cloneFormulationInfoModel.CloneR_DContact" placeholder="">
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"><span><em> Project </em></span> </label>
+            </div>
+            <input type="text" appInputTrim [disabled]="true" class="form-control"
+              [(ngModel)]="cloneFormulationInfoModel.CloneProject" placeholder="">
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"><span><em> Reason for Change </em></span></label>
+            </div>
+            <textarea type="text" appInputTrim [disabled]="true" class="form-control"
+              [(ngModel)]="cloneFormulationInfoModel.CloneReasonForChange" placeholder=""> </textarea>
+          </div>
+        </div>
+      </div>
+      <!-- SOURCE FORMULATION VERSION END -->
+      <!-- DESTINATION START -->
+      <form [formGroup]="registerForm">
+        <div class="row">
+          <div class="col-md-12">
+            <h6 class="m-t-20 m-b10"> Destination </h6>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="exampleInputEmail1"><span><em> Product Name </em></span></label>
+              </div>
+              <kendo-dropdownlist class="kendo_custom_dropdown" formControlName="ProductName" [data]="allProductsInfo"
+                textField="Name" [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="false"
+                [(ngModel)]="formulationInfoModel.Products" (valueChange)="OnProductsChange($event, 'clone')"
+                [ngClass]="{ 'is-invalid': submitted && f.ProductName.invalid }">
+              </kendo-dropdownlist>
+              <!-- <div *ngIf="submitted && f.ProductName.invalid" class="invalid-feedback">
+                <div *ngIf="f.ProductName.errors.required"> This field is required. </div>
+              </div> -->
+              <div class="invalid-feedback"
+                *ngIf="registerForm.controls.ProductName.errors?.required && registerForm.controls.ProductName.touched">
+                This field is required.
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputEmail1"><span><em> Product Category </em></span></label>
+            </div>
+            <kendo-dropdownlist class="kendo_custom_dropdown" formControlName="ProductCategory"
+              [data]="allProductCategoriesInfo" textField="Name" valueField="Id" [valuePrimitive]="false"
+              [(ngModel)]="formulationInfoModel.ProductCategories" (valueChange)="GetFormulationVersions($event)"
+              [defaultItem]="defaultItem" [ngClass]="{ 'is-invalid': submitted && f.ProductCategory.invalid }">
+            </kendo-dropdownlist>
+            <div *ngIf="submitted && f.ProductCategory.errors" class="invalid-feedback">
+              <div *ngIf="f.ProductCategory.errors.required">This field is required.</div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="exampleInputPassword1"><span><em>Formulation Reference Number<span
+                      class="mandatory"></span></em></span></label>
+            </div>
+            <input type="text" appInputTrim class="form-control"
+              formControlName="FormulationReferenceNo" [(ngModel)]="formulationInfoModel.FormulationReferenceNo"
+              placeholder="" [ngClass]="{ 'is-invalid': submitted && f.FormulationReferenceNo.invalid }" required
+              maxlength="50">
+            <div *ngIf="submitted && f.FormulationReferenceNo.invalid" class="invalid-feedback">
+              <div *ngIf="f.FormulationReferenceNo.errors.required">This field is required.</div>
+            </div>
+            <div class="invalid-feedback" *ngIf="IsCheckFormulationDetails">
+              {{env.ValidationMessages.Thisvaluealreadyexists}}</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4 disableElementsss">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em> Version Number </em></span></label>
+              </div>
+              <input type="text" appInputTrim class="form-control m-b-5" formControlName="VersionNo" disabled
+                [(ngModel)]="formulationInfoModel.VersionNo" placeholder=""
+                [ngClass]="{ 'is-invalid': submitted && f.VersionNo.invalid }" required>
+              <div *ngIf="submitted && f.VersionNo.invalid" class="invalid-feedback">
+                <div *ngIf="f.VersionNo.errors.required"> This field is required.</div>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" formControlName="Version" name="Version" value="Major"
+                  (click)="VersionSelect('Major')" [disabled]="isFormulationDisable">
+                <label class="form-check-label" for="inlineRadio1">Major Version</label>
+              </div>
+              <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="Version" formControlName="Version" value="Minor"
+                  (click)="VersionSelect('Minor')" [disabled]="isFormulationDisable">
+                <label class="form-check-label" for="inlineRadio2">Minor Version</label>
+              </div>
+            </div>
+            <div class="col-md-8">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em>Markets</em></span> </label>
+              </div>
+              <kendo-multiselect [data]="allMarkets" class="kendo_custom_dropdown kendo_custom_multiselect"
+                textField="Name" valueField="Id" [(ngModel)]="formulationInfoModel.Markets" formControlName="Markets"
+                [ngClass]="{ 'is-invalid': submitted && f.Markets.invalid }" required
+                [kendoDropDownFilter]="filterSettings">
+              </kendo-multiselect>
+              <div *ngIf="submitted && f.Markets.invalid" class="invalid-feedback">
+                <div *ngIf="f.Markets.errors.required">At least one selection is required.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em> R &amp; D Contact </em></span> </label>
+              </div>
+              <input type="text" appInputTrim class="form-control" [(ngModel)]="formulationInfoModel.R_DContact"
+                placeholder="" formControlName="RDContact"
+                [ngClass]="{ 'is-invalid': submitted && f.RDContact.invalid }" maxlength="100">
+              <!-- <div *ngIf="submitted && f.RDContact.invalid" class="invalid-feedback">
+              <div *ngIf="f.RDContact.errors.required"> Required</div>
+            </div> -->
+            </div>
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em> Project </em></span> </label>
+              </div>
+              <input type="text" appInputTrim class="form-control" formControlName="Project"
+                [(ngModel)]="formulationInfoModel.Project" placeholder=""
+                [ngClass]="{ 'is-invalid': submitted && f.Project.invalid }" maxlength="100">
+              <!-- <div *ngIf="submitted && f.Project.invalid" class="invalid-feedback">
+              <div *ngIf="f.Project.errors.required"> Required</div>
+            </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="combo-label">
+                <label for="exampleInputPassword1"><span><em> Reason for Change </em></span> </label>
+              </div>
+              <textarea type="text" appInputTrim class="form-control" formControlName="ReasonForChange"
+                [(ngModel)]="formulationInfoModel.ReasonForChange" placeholder=""
+                [ngClass]="{ 'is-invalid': submitted && f.ReasonForChange.invalid }" maxlength="500"> </textarea>
+              <!-- <div *ngIf="submitted && f.ReasonForChange.invalid" class="invalid-feedback">
+              <div *ngIf="f.ReasonForChange.errors.required"> Required</div>
+            </div> -->
+            </div>
+          </div>
+        </div>
+        <div class="d-flex bd-highlight page_title_section">
+          <div class="bd-highlight flex-left">
+            <span class="m-0"> <em> Raw Materials </em> </span>
+          </div>
+          <div class="flex-grow-1 bd-highlight flex-left">
+            <span> </span>
+          </div>
+          <div class="bd-highlight">
+
+          </div>
+        </div>
+        <ng-template #templateDoc let-anchor>
+          <span>{{ anchor.nativeElement.innerText }}</span>
+        </ng-template>
+        <!-- <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)"> -->
+        <kendo-grid kendoTooltip filter="td,th" [tooltipTemplate]="templateDoc" class="k-grid-custom"
+          [data]="formulationRawMaterials" [height]="400" [pageable]="{
+          buttonCount: this.searchFilter.buttonCount,
+          info: true,
+          type: type,
+          pageSizes: true,
+          previousNext: true,
+          position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+          [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+          (pageChange)="pageChange($event)">
+          >
+          <kendo-grid-column field="RawMaterialName" title="Raw Material" width=""> </kendo-grid-column>
+          <kendo-grid-column field="RawMaterialFunctionName" title="Functions" width="150"> </kendo-grid-column>
+          <kendo-grid-column field="SupplierName" title="Supplier" width="150"> </kendo-grid-column>
+          <kendo-grid-column field="ManufacturerName" title="Manufacturer" width="150"></kendo-grid-column>
+          <kendo-grid-column field="TradeName" title="Trade Name" width="120"></kendo-grid-column>
+          <kendo-grid-column field="SubComponentName" title="Sub-components" width="150"></kendo-grid-column>
+          <kendo-grid-column field="RawMaterialConcentration" title="Concentration (%)" width="150"></kendo-grid-column>
+        </kendo-grid>
+        <!-- </div> -->
+      </form>
+      <!-- DESTINATION END -->
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-light btn-radius"
+        (click)="CloneFormulationClose(CloneFormulation)">Cancel</button>
+
+      <button type="submit" (click)="AddCloneFormulationInfo('manage',AllVersion)" *ngIf="rmmapi.getRolePrivilege('CF')"
+        class="btn btn-outline-primary btn-radius">Save & Manage
+      </button>
+
+      <button type="button" (click)="AddCloneFormulationInfo('save',Formulationform)"
+        *ngIf="rmmapi.getRolePrivilege('CF')" class="btn btn-primary btn-save btn-radius">{{
+        actionType ? 'Save' :"Save" }}</button>
+    </div>
+  </div>
+  <!-- <div *ngIf="isLoading" class="k-loading-mask k-i-loading"></div> -->
+</ng-template>
+<ng-template #CopyFormulation let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h5 class="modal-title"> Copy Raw Materials & Markets</h5>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')">&times;</button>
+  </div>
+  <div class="modal-body pt-1">
+    <!-- RAW MATERIALS VERSION START -->
+    <div class="d-flex bd-highlight page_title_section">
+      <div class="bd-highlight flex-left">
+        <span class="m-0"> <em> Raw Materials </em> </span>
+      </div>
+      <div class="flex-grow-1 bd-highlight flex-left">
+        <span> </span>
+      </div>
+      <div class="bd-highlight">
+      </div>
+    </div>
+    <form novalidate #myForm="ngForm">
+      <ng-template #template2 let-anchor>
+        <span>{{ anchor.nativeElement.innerText }}</span>
+      </ng-template>
+      <kendo-grid kendoTooltip filter="td, th" [tooltipTemplate]="template2" class="k-grid-custom"
+        [data]="formulationRawMaterials" [height]="400">
+        <kendo-grid-column field="RawMaterialName" title="Raw Material" width=""> </kendo-grid-column>
+        <kendo-grid-column field="RawMaterialFunctionName" title="Functions" width=""> </kendo-grid-column>
+        <kendo-grid-column field="SupplierName" title="Supplier" width=""> </kendo-grid-column>
+        <kendo-grid-column field="ManufacturerName" title="Manufacturer" width=""></kendo-grid-column>
+        <kendo-grid-column field="TradeName" title="Trade Name" width=""></kendo-grid-column>
+        <kendo-grid-column field="SubComponentName" title="Sub-components" width=""></kendo-grid-column>
+        <kendo-grid-column field="RawMaterialConcentration" title="Concentration (%)" width="">
+        </kendo-grid-column>
+        <kendo-grid-column title="View Sub-component Details" width="">
+          <ng-template kendoGridCellTemplate let-dataItem>
+            <div class="k-grid-action-list">
+              <button aria-label="View" data-balloon-pos="left" class="btn btn-sm btn-light"
+                (click)="ViewFormulationRawMaterialsInfo(CopySubComponentsRawMaterials,dataItem)">
+                <span class="fa-view"> </span> </button>
+              <!-- <i class="fa fa-edit"></i> -->
+              <!-- <button aria-label="In-Active" data-balloon-pos="left"
+                class="btn btn-sm grid-btn-danger kendo-grid-btn" (click)="InActiveModalInfo(InActiveModal,dataItem)"><i
+                    class="fa fa-ban"></i></button> -->
+            </div>
+          </ng-template>
+        </kendo-grid-column>
+      </kendo-grid>
+    </form>
+    <!-- RAW MATERIALS VERSION END -->
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="CloseCopyFormulationRawMaterials(Formulation)"
+      class="btn btn-outline-light btn-radius">Cancel</button>
+    <button type="button" (click)="SaveCopyFormulationRawMaterials(Formulation)"
+      class="btn btn-primary btn-save btn-radius">{{
+      'Save' }}</button>
+  </div>
+</ng-template>
+<ng-template #InActiveModal let-modal>
+  <div class="modal-body modal-body-sm">
+    <div class="text-center">
+      <div class="avatar-md">
+        <div class="avatar-title">
+          <img class="inacive"
+            [src]="formulationInfoModel.IsDeleted ? '../../../assets/img/check.svg' : '../../../assets/img/ban.svg' "
+            width="50">
+        </div>
+      </div>
+      
+      <div class="row justify-content-center" *ngIf="this.formulationInfoModel.FormulationType == 'Version'">
+       
+        <h6
+          [innerHtml]="formulationInfoModel.IsDeleted ? 'Are you sure you want to reactivate version?' : 'Are you sure you want to inactivate version?' ">
+        </h6>
+        
+      </div>
+      <div class="row justify-content-center" *ngIf="this.formulationInfoModel.FormulationType != 'Version'">
+       
+        <h6
+          [innerHtml]="formulationInfoModel.IsDeleted ? 'Are you sure you want to reactivate Formulation?' : 'Are you sure you want to inactivate Formulation?' ">
+        </h6>
+        
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary btn-no btn-radius" (click)="modal.dismiss('Cross click')">No</button>
+    <button type="button" class="btn btn-outline-light btn-radius"
+      (click)="UpdateFormulationDetailsStatus()">Yes</button>
+  </div>
+</ng-template>
+<ng-template #AllVersion let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h5 class="modal-title"> Versions</h5>
+    <button type="button" class="close" (click)="modal.dismiss('Cross click')">&times;</button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body pt-2">
+    <div class="d-flex bd-highlight page_title_section">
+      <div class="flex-grow-1 bd-highlight">
+        <h5 class="m-t-15 f-s-14"> <span class="text-muted"> Formulation Reference No. </span>
+          <span class=""> {{formulationInfoModel.FormulationReferenceNo}} </span>
+        </h5>
+      </div>
+      <div class="bd-highlight page_title_section_right">
+        <div class="bd-highlight"> <button type="button" class="btn btn-primary btn-radius" data-toggle="modal"
+            (click)="CreateNewVersion(Formulation, 'new')" *ngIf="rmmapi.getRolePrivilege('CF')"> <i
+              class="fa fa-plus"></i>New Version</button>
+        </div>
+      </div>
+    </div>
+    <ng-template #templateVersions let-anchor>
+      <span>{{ anchor.nativeElement.innerText }}</span>
+    </ng-template>
+    <div kendoTooltip showOn="none" [tooltipTemplate]="templateVersions" filter=".k-grid td th" #tooltipVersions="kendoTooltip"
+    (mouseover)="showTooltip($event, tooltipVersions)">
+    <kendo-grid class="k-grid-custom" [data]="allVersionsInfo" [height]="400">
+      <kendo-grid-column field="VersionNo" title="Version Number" width=""> </kendo-grid-column>
+      <kendo-grid-column field="UpdatedBy" title="Last Updated By" width=""></kendo-grid-column>
+      <kendo-grid-column field="UpdatedDate" title="Last Updated Date" width="">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          {{dataItem.UpdatedDate | date: 'dd/MMM/yyyy'}}
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-column field="MarketNames" title="Markets" width="">
+      </kendo-grid-column>
+      <kendo-grid-column field="StatusName" title="Status" width=""> </kendo-grid-column>
+      <kendo-grid-column title="Actions" width="90">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="k-grid-action-list">
+            <button aria-label="View/Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+              *ngIf="rmmapi.getRolePrivilege('MF')" (click)="modal.dismiss('Cross click')"
+              [disabled]="dataItem.IsDeleted"
+              (click)="EditFormulationVersionDetailsInfo('View',Formulation,dataItem,AllVersion)"> <span
+                class="fa-edit"></span></button>
+            <button  [attr.aria-label]="dataItem.IsDeleted ? 'Reactivate' : 'Inactivate'" data-balloon-pos="left"
+              *ngIf="rmmapi.getRolePrivilege('IF')" class="btn btn-sm btn-light"
+              (click)="InActiveModalInfo(InActiveModal,dataItem,'Version')">
+              <span [ngClass]="dataItem.IsDeleted ? 'fa-check btn-light' : 'fa-ban btn-light-danger'"></span></button>
+          </div>
+        </ng-template>
+      </kendo-grid-column>
+    </kendo-grid>
+    </div>
+  </div>
+  <!-- Modal footer -->
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-light btn-radius"
+      (click)="NavigateFormulations()">Cancel</button>
+    <!-- <button type="button" class="btn btn-primary btn-save btn-radius"
+      (click)="NavigateVersionChangeDetails(CopyFormulation)">Save</button> -->
+  </div>
+</ng-template>
+<ng-template #SubComponentsRawMaterials let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Raw Material' :"Edit Raw Material" }}
+    </h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body">
+    <form id="frm_FormulationRawMaterials" name="form" #FormulationRawMaterialsform="ngForm">
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Raw Material Name and Code </em></span> </label>
+              </div>
+              <kendo-dropdownlist name="FormulationRawMaterials" class="kendo_custom_dropdown"
+                [data]="env.rawMaterialsList" textField="Name" [defaultItem]="defaultItemMaterial"
+                (valueChange)="RawMaterialChange($event)" valueField="RawMaterialId" [valuePrimitive]="false"
+                [(ngModel)]="formulationRawMaterialsModel.RawMaterialIds" #FormulationRawMaterials="ngModel"
+                [ngClass]="{ 'is-invalid ng-invalid ng-touched': FormulationRawMaterialsform.submitted && FormulationRawMaterials.invalid }"
+                required>
+              </kendo-dropdownlist>
+              <div *ngIf="FormulationRawMaterialsform.submitted && FormulationRawMaterials.invalid"
+                class="invalid-feedback">
+                <div *ngIf="FormulationRawMaterials.errors.required">This field is required.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Function </em></span></label>
+              </div>
+              <kendo-multiselect name="Function" [data]="env.functionsInfoList"
+                class="kendo_custom_dropdown kendo_custom_multiselect" textField="Name" valueField="Id"
+                [(ngModel)]="formulationRawMaterialsModel.RawMaterialFunctions" #Function="ngModel"
+                [kendoDropDownFilter]="filterSettings"
+                [ngClass]="{ 'is-invalid ng-invalid ng-touched': FormulationRawMaterialsform.submitted && Function.invalid }"
+                required>
+              </kendo-multiselect>
+              <div *ngIf="FormulationRawMaterialsform.submitted && Function.invalid" class="invalid-feedback">
+                <div *ngIf="Function.errors.required">This field is required.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Suppliers </em></span></label>
+              </div>
+              <kendo-dropdownlist name="Suppliers" class="kendo_custom_dropdown" [data]="env.suppliersInfoList"
+                textField="Name" [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="true"
+                [(ngModel)]="formulationRawMaterialsModel.SupplierId" #Suppliers="ngModel"
+                [ngClass]="{ 'is-invalid ng-invalid ng-touched': FormulationRawMaterialsform.submitted && Suppliers.invalid }"
+                required>
+              </kendo-dropdownlist>
+              <div *ngIf="FormulationRawMaterialsform.submitted && Suppliers.invalid" class="invalid-feedback">
+                <div *ngIf="Suppliers.errors.required"> This field is required.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+              </div>
+              <kendo-dropdownlist name="Manufacturer" class="kendo_custom_dropdown" [data]="env.manufacturersInfoList"
+                textField="Name" [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="true"
+                [(ngModel)]="formulationRawMaterialsModel.ManufacturerId" #Manufacturer="ngModel"
+                [ngClass]="{ 'is-invalid ng-invalid ng-touched': FormulationRawMaterialsform.submitted && Manufacturer.invalid }"
+                required>
+              </kendo-dropdownlist>
+              <div *ngIf="FormulationRawMaterialsform.submitted && Manufacturer.invalid" class="invalid-feedback">
+                <div *ngIf="Manufacturer.errors.required"> This field is required.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Trade Name </em></span></label>
+              </div>
+              <input type="text" appInputTrim class="form-control" name="TradeName"
+                (blur)="IsCheckFormulationRawMaterialsInfo()" [(ngModel)]="formulationRawMaterialsModel.TradeName"
+                placeholder="" #TradeName="ngModel"
+                [ngClass]="{ 'is-invalid ng-invalid ng-touched': FormulationRawMaterialsform.submitted && TradeName.invalid }"
+                required>
+              <div *ngIf="FormulationRawMaterialsform.submitted && TradeName.invalid" class="invalid-feedback">
+                <div *ngIf="TradeName.errors.required">This field is required.</div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-group">
+              <div class="combo-label">
+                <label for="HealthAuthority"> <span><em> Concentration of Raw Material in Finished Product </em></span>
+                </label>
+              </div>
+              <input type="number" appInputTrim class="form-control" name="TDSConcentration"
+                (blur)="IsCheckFormulationRawMaterialsInfo()"
+                [(ngModel)]="formulationRawMaterialsModel.RawMaterialConcentration" placeholder=""
+                #TDSConcentration="ngModel"
+                [ngClass]="{ 'is-invalid': FormulationRawMaterialsform.submitted && TDSConcentration.invalid }"
+                required>
+              <div *ngIf="FormulationRawMaterialsform.submitted && TDSConcentration.invalid" class="invalid-feedback">
+                <div *ngIf="TDSConcentration.errors.required"> This field is required.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="d-flex bd-highlight page_title_section">
+      <div class="bd-highlight flex-left">
+        <span> <em> Configure Sub-components </em></span>
+      </div>
+      <div class="flex-grow-1 bd-highlight flex-left">
+        <span> </span>
+      </div>
+      <div class="bd-highlight">
+        <span>
+          <button type="button" class="btn btn-primary btn-radius" data-toggle="modal"
+            (click)="AddNewPostReactionSubcomponent(NewPostReactionSubcomponent)"> Add New Post Reaction Sub component
+          </button> </span>
+      </div>
+    </div>
+
+    <form novalidate #myForm="ngForm">
+      <kendo-grid class="k-grid-custom" [data]="formulationRawMaterialsModel.FormulationRawMaterialSubComponents">
+        <kendo-grid-column field="SubComponentName" title="Sub-component Name" width="">
+        </kendo-grid-column>
+        <kendo-grid-column field="SubComponentFunctionName" title="Functions" width=""> </kendo-grid-column>
+        <kendo-grid-column field="Impurity" title="Impurity" width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.Impurity" kendoGridFocusable name="ImpuritiesPPM" type="checkbox" />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="CASNumber" title="CAS Number" width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.CASNumber" name="CASNumber" class="k-textbox" required />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="ECNumberOrKENumber" title="EC Number or KE Number" width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.ECNumberOrKENumber" name="ECNumberOrKENumber" class="k-textbox" required />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="EUINCIName" title="EU INCI Name" width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.EUINCIName" name="EUINCIName" class="k-textbox" required />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="USINCIName" title="US INCI Name" width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.USINCIName" name="USINCIName" class="k-textbox" required />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="PostReactionWeightInFinishedProduct"
+          title="Post Reaction:wt% in finished product (if applicable, delete this column if there is no reaction)"
+          width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.PostReactionWeightInFinishedProduct" name="PostReactionWeightInFinishedProduct"
+              class="k-textbox" required />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column field="SubComponentConcentrationINCI"
+          title="Concentration of Raw Material in Finished Product" width="">
+          <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+            <input [(ngModel)]="dataItem.SubComponentConcentrationINCI"
+              name="SubComponentConcentrationInFinishedProduct" class="k-textbox" required />
+          </ng-template>
+        </kendo-grid-column>
+        <kendo-grid-column title="Actions" width="">
+          <ng-template kendoGridCellTemplate let-dataItem>
+            <button data-toggle="tooltip" data-placement="top" title="Edit"
+              class="btn btn-sm alert-light kendo-grid-btn"
+              (click)="EditFormulationRawMaterialsInfo(FormulationRawMaterials,dataItem)"><i
+                class="fa fa-edit"></i></button>&nbsp;
+            <button data-toggle="tooltip" data-placement="top" title="Inactive"
+              class="btn btn-sm alert-danger kendo-grid-btn"
+              (click)="InActiveModalInfo(InActiveModal,dataItem,'Formulation')"><i class="fa fa-ban"></i></button>
+          </ng-template>
+        </kendo-grid-column>
+      </kendo-grid>
+    </form>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="modal.dismiss('Cross click')"
+      class="btn btn-outline-light btn-radius">Cancel</button>
+    <button type="button" (click)="AddFormulationRawMaterialsInfo(CloneFormulation)"
+      class="btn btn-primary btn-save btn-radius">{{
+      'Save' }}</button>
+  </div>
+</ng-template>
+<ng-template #NewPostReactionSubcomponent let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">{{ 'Add Sub-component' }}
+    </h5>
+    <button type="button" class="close" aria-label="Close"
+      (click)="AddPostReactionSubcomponent(SubComponentsRawMaterials)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- Modal body -->
+  <form id="frm_PostReactionSubcomponent" name="form" #PostReactionSubcomponentform="ngForm"
+    (ngSubmit)="PostReactionSubcomponentform.form.valid && AddPostReactionSubcomponent(SubComponentsRawMaterials)">
+    <div class="modal-body">
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="SupplierName"> <span> <em> Sub-component Name <span class="mandatory"></span>
+                  </em></span></label>
+            </div>
+            <kendo-dropdownlist [data]="subComponentList" [filterable]="true" textField="Name" valueField="Id"
+              (filterChange)="handleFilter($event)" (valueChange)="OnSubComponentChange($event)"
+              [(ngModel)]="Model.SubComponent" formControlName="SubComponentId" [defaultItem]="defaultItemSearch">
+            </kendo-dropdownlist>
+            <div class="invalid-feedback"
+              *ngIf="!isDuplicateSupplier && suppliersform.controls.SubComponentId.errors?.required && suppliersform.controls.SubComponentId.touched">
+              This field is required.</div>
+
+          </div>
+          <div class="col-md-4">
+            <label for="SupplierName"> Given Sub-component Name </label>
+            <input type="text" appInputTrim class="form-control" name="GivenSubComponentName"
+              [(ngModel)]="Model.GivenSubComponentName" formControlName="GivenSubComponentName" placeholder="">
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="SupplierName"> <span> <em> 'CAS Number <span class="mandatory"></span> </em> </span>
+              </label>
+            </div>
+            <input type="text" appInputTrim class="form-control" name="CASNumber" [(ngModel)]="Model.CASNumber"
+              formControlName="CASNumber" placeholder="">
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.CASNumber.errors?.required && suppliersform.controls.CASNumber.touched">
+              This field is required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+
+            <label for="SupplierName">EC Number or KE Number</label>
+            <input type="text" appInputTrim class="form-control" name="ECNumberOrKENumber"
+              [(ngModel)]="Model.ECNumberOrKENumber" formControlName="ECNumberOrKENumber" placeholder="">
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.ECNumberOrKENumber.errors?.required && suppliersform.controls.ECNumberOrKENumber.touched">
+              This field is required.</div>
+
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="ImpuritiesPPM"> <span><em> Impurity <span class="mandatory"> </span> </em></span></label>
+            </div>
+            <kendo-dropdownlist class="kendo_custom_dropdown" [data]="impurities" textField="Name" valueField="Id"
+              formControlName="ImpuritiesPPM" [valuePrimitive]="true" [(ngModel)]="Model.ImpuritiesPPM"
+              [defaultItem]="defaultItem">
+            </kendo-dropdownlist>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="SupplierName"> <span aria-label="Sub-Component Concentration in Raw Material"
+                  data-balloon-pos="up"> <em> Sub-Component Concentration (%) in Raw Material </em> <span
+                    class="mandatory"></span>
+                </span></label>
+            </div>
+            <input type="text" appInputTrim class="form-control" name="RawMaterialSubComponentConcentration"
+              [(ngModel)]="Model.RawMaterialSubComponentConcentration"
+              formControlName="RawMaterialSubComponentConcentration" placeholder="">
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.RawMaterialSubComponentConcentration.errors?.required && suppliersform.controls.RawMaterialSubComponentConcentration.touched">
+              This field is required.</div>
+
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <label for="SupplierName">Source Document </label>
+            <kendo-dropdownlist class="kendo_custom_dropdown" name="SourceDocumentId" [data]="supplierDocumentList"
+              textField="Name" valueField="Id" [valuePrimitive]="true" [(ngModel)]="Model.SourceDocumentId"
+              formControlName="SourceDocumentId" [defaultItem]="defaultItem">
+            </kendo-dropdownlist>
+          </div>
+          <div class="col-md-4">
+            <label for="ImpuritiesPPM">Reach Registration Number Status</label>
+            <textarea appInputTrim class="form-control" name="REAChNumberOrStatus"
+              [(ngModel)]="Model.REAChNumberOrStatus" formControlName="REAChNumberOrStatus" placeholder=""></textarea>
+
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.REAChNumberOrStatus.errors?.required && suppliersform.controls.REAChNumberOrStatus.touched">
+              This field is required.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="SupplierName">US INCI Name</label>
+            <input type="text" appInputTrim class="form-control" name="USINCIName" [(ngModel)]="Model.USINCIName"
+              formControlName="USINCIName" placeholder="">
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.USINCIName.errors?.required && suppliersform.controls.USINCIName.touched">
+              This field is required.</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="Location"> <span> <em> Function <span class="mandatory"> </span> </em> </span></label>
+            </div>
+            <kendo-multiselect name="SubComponentFunction" [data]="subComponentFunctionList" textField="Name"
+              [kendoDropDownFilter]="filterSettings" valueField="Id" [(ngModel)]="Model.SubComponentFunction"
+              formControlName="SubComponentFunction" required>
+            </kendo-multiselect>
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.SubComponentFunction.errors?.required && suppliersform.controls.SubComponentFunction.touched">
+              This field is required.</div>
+          </div>
+          <div class="col-md-4">
+            <label for="SupplierName">EU INCI Name</label>
+            <input type="text" appInputTrim class="form-control" name="EUINCIName" [(ngModel)]="Model.EUINCIName"
+              formControlName="EUINCIName" placeholder="">
+            <div class="invalid-feedback"
+              *ngIf="suppliersform.controls.EUINCIName.errors?.required && suppliersform.controls.EUINCIName.touched">
+              This field is required.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" (click)="AddPostReactionSubcomponent(SubComponentsRawMaterials)"
+        class="btn btn-outline-light btn-radius">Cancel</button>
+      <button type="submit" class="btn btn-primary btn-radius">{{
+        'Save' }}</button>
+    </div>
+  </form>
+</ng-template>
+<ng-template #CopySubComponentsRawMaterials let-modal>
+  <!-- Modal Header -->
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">View Sub-components</h5>
+    <button type="button" class="close" aria-label="Close" (click)="CloseSubComponentsRawMaterials(CopyFormulation)">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <!-- Modal body -->
+  <div class="modal-body pt-1">
+    <div class="d-flex bd-highlight page_title_section">
+      <div class="bd-highlight flex-left">
+        <span class="m-0"> <em> Sub-components </em>
+        </span>
+      </div>
+      <div class="flex-grow-1 bd-highlight flex-left">
+        <span></span>
+      </div>
+      <div class="bd-highlight">
+      </div>
+    </div>
+    <form novalidate #myForm="ngForm">
+      <kendo-grid class="k-grid-custom" [data]="formulationRawMaterialsModel.FormulationRawMaterialSubComponents"
+        [height]="410">
+        <kendo-grid-column field="SubComponentName" title="Sub-component" width="">
+        </kendo-grid-column>
+        <kendo-grid-column field="SubComponentFunctionName" title="Functions" width=""> </kendo-grid-column>
+        <kendo-grid-column field="Impurity" title="Impurity" width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.Impurity" kendoGridFocusable name="ImpuritiesPPM" type="checkbox" />
+              </ng-template> -->
+        </kendo-grid-column>
+        <kendo-grid-column field="CASNumber" title="CAS Number" width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.CASNumber" name="CASNumber" class="k-textbox" required />
+              </ng-template> -->
+        </kendo-grid-column>
+        <kendo-grid-column field="ECNumberOrKENumber" title="EC Number or KE Number" width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.ECNumberOrKENumber" name="ECNumberOrKENumber" class="k-textbox" required />
+              </ng-template> -->
+        </kendo-grid-column>
+        <kendo-grid-column field="EUINCIName" title="EU INCI Name" width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.EUINCIName" name="EUINCIName" class="k-textbox" required />
+              </ng-template> -->
+        </kendo-grid-column>
+        <kendo-grid-column field="USINCIName" title="US INCI Name" width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.USINCIName" name="USINCIName" class="k-textbox" required />
+              </ng-template> -->
+        </kendo-grid-column>
+        <kendo-grid-column field="PostReactionWeightInFinishedProduct" title="Post Reaction Weight% in Finished Product"
+          width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.PostReactionWeightInFinishedProduct"
+                  name="PostReactionWeightInFinishedProduct" class="k-textbox" required />
+              </ng-template> -->
+        </kendo-grid-column>
+        <kendo-grid-column field="SubComponentConcentrationINCI"
+          title="Concentration of Raw Material in Finished Product" width="">
+          <!-- <ng-template kendoGridCellTemplate let-dataItem="dataItem">
+                <input [(ngModel)]="dataItem.SubComponentConcentrationINCI"
+                  name="SubComponentConcentrationInFinishedProduct" class="k-textbox" required />
+              </ng-template> -->
+        </kendo-grid-column>
+        <!-- <kendo-grid-column title="Actions" width="120">
+              <ng-template kendoGridCellTemplate let-dataItem>
+                <button data-toggle="tooltip" data-placement="top" title="Edit"
+                  class="btn btn-sm alert-light kendo-grid-btn"
+                  (click)="EditFormulationRawMaterialsInfo(FormulationRawMaterials,dataItem)"><i
+                    class="fa fa-edit"></i></button>&nbsp;
+                <button data-toggle="tooltip" data-placement="top" title="Inactive"
+                  class="btn btn-sm alert-danger kendo-grid-btn" (click)="InActiveModalInfo(InActiveModal,dataItem)"><i
+                    class="fa fa-ban"></i></button>
+              </ng-template>
+            </kendo-grid-column> -->
+      </kendo-grid>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" (click)="CloseSubComponentsRawMaterials(CopyFormulation)"
+      class="btn btn-outline-light btn-radius">Close</button>
+    <!-- <button type="button" (click)="AddFormulationRawMaterialsInfo(CloneFormulation)" class="btn btn-primary btn-radius">{{ 
+      'Save'  }}</button> -->
+  </div>
+</ng-template>
+<ng-template #ViewCommentModel let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">View Comments </h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body pt-2">
+    <div class="d-flex bd-highlight page_title_section">
+      <div class="flex-grow-1 bd-highlight">
+        <h5 class="m-t-15 f-s-14"> <span class="text-muted"> Formulation Reference No. </span>
+          <span class=""> {{formulationInfoModel.FormulationReferenceNo}} , &nbsp; </span>
+          <span class="text-muted">Version No.</span> <span> {{formulationInfoModel.VersionNo}} </span>
+        </h5>
+      </div>
+      <div class="bd-highlight page_title_section_right">
+        <div class="bd-highlight">
+          <button *ngIf="rmmapi.getRolePrivilege('ARC')" id="modal-basic-title" (click)="AddComment(AddCommentModel)"
+            type="button" class="btn btn-primary btn-radius ripple">
+            <i class="fa fa-plus"></i> Comment
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template #templateViewComments let-anchor>
+      <span>{{ anchor.nativeElement.innerText }}</span>
+    </ng-template>
+    
+    <div kendoTooltip showOn="none" [tooltipTemplate]="templateViewComments" filter=".k-grid td th" #tooltipComments="kendoTooltip"
+    (mouseover)="showTooltip($event, tooltipComments)">
+    
+    <!-- <div kendoTooltip  showOn="none" [tooltipTemplate]="template2" filter=".k-grid td" (mouseover)="showTooltipC($event)"> -->
+    
+    
+      <kendo-grid  class="k-grid-custom"
+      [data]="formulationReviewCommentsList" *ngIf="rmmapi.getRolePrivilege('FL')" [height]="400" [pageable]="{
+                      buttonCount: this.searchFilter.buttonCount,
+                      info: true,
+                      type: type,
+                      pageSizes: true,
+                      previousNext: true,
+                      position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+      [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="ReviewSort" (sortChange)="ReviewSortChange($event)"
+      (pageChange)="ReviewPageChange($event)">
+      <kendo-grid-column field="RawMaterialName" title="Raw Material Name and Code" width="180"> </kendo-grid-column>
+      <kendo-grid-column field="ManufacturerName" title="Manufacturer" width="90"></kendo-grid-column>
+      <kendo-grid-column field="SupplierName" title="Supplier" width="70"></kendo-grid-column>
+      <kendo-grid-column field="TradeName" title="Trade Name" width="90"></kendo-grid-column>
+      <kendo-grid-column field="SubComponentName" title="Sub-component" width="100"></kendo-grid-column>
+      <kendo-grid-column field="CommentCreatedBy" title="Reviewed By/ Date" width="130">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          {{dataItem.CommentCreatedBy}}/{{dataItem.CommentCreatedDate | date: 'MMMM dd yyyy'}}
+        </ng-template>
+      </kendo-grid-column>
+      <kendo-grid-column field="Comment" title="Comment" width="120"></kendo-grid-column>
+      <kendo-grid-column field="StatusName" title="Status" width="70"></kendo-grid-column>
+      <kendo-grid-column title="Actions" width="90">
+        <ng-template kendoGridCellTemplate let-dataItem>
+          <div class="k-grid-action-list">
+            <button aria-label="Reply" data-balloon-pos="left" class="btn btn-sm btn-light"
+              *ngIf="rmmapi.getRolePrivilege('RRC')" (click)="EditReviewComment(ReplyCommentModel,dataItem,1)"
+              [disabled]="dataItem.StatusCode === 'FCC' ? true : false"><span class="fa-reply"></span></button>
+            <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+              *ngIf="rmmapi.getRolePrivilege('ERC') || rmmapi.getRolePrivilege('VRC')"
+              (click)="EditReviewComment(EditCommentModel,dataItem,0)"
+              [disabled]="dataItem.StatusCode === 'FCC' ? true : false"><span class="fa-edit"></span></button>
+          </div>
+        </ng-template>
+      </kendo-grid-column>
+    </kendo-grid>
+
+  </div>
+    <!-- </div> -->
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-light btn-radius"
+      (click)="modal.dismiss('Cross click')">Cancel</button>
+  </div>
+</ng-template>
+<ng-template #AddCommentModel let-modal>
+  <div>
+    <div class="modal-header">
+      <h5 class="modal-title" id="modal-basic-title">Add Comments </h5>
+      <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="d-flex bd-highlight page_title_section p-0">
+        <div class="flex-grow-1 bd-highlight">
+          <h5 class="m-b-20 f-s-14"> <span class="text-muted"> Formulation Reference No. </span>
+            <span class=""> {{formulationInfoModel.FormulationReferenceNo}} , &nbsp; </span>
+            <span class="text-muted">Version No.</span> <span> {{formulationInfoModel.VersionNo}} </span>
+          </h5>
+        </div>
+        <div class="bd-highlight page_title_section_right">
+          <div class="bd-highlight">
+            <a href="#" data-toggle="modal" data-target="#myModal" (click)="ViewCommentsGrid(ViewCommentModel)"> View
+              All Comments </a>
+          </div>
+        </div>
+      </div>
+
+      <form id="frm_FormulationRawMaterials" [formGroup]="formulationReviewCommentForm">
+        <!-- Modal body -->
+
+        <!-- <a class="modal-title" id="modal-basic-title" (click)="ViewCommentsGrid(ViewCommentModel)">View All
+                Comment
+              </a> -->
+
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Raw Material Name and Code </em> </span></label>
+              </div>
+              <kendo-dropdownlist name="RawMaterialId" class="kendo_custom_dropdown" [data]="rawMaterialList"
+                textField="Name" valueField="Id" [defaultItem]="defaultItemComment"
+                [(ngModel)]="formulationReviewRawMaterialsModel.RawMaterialId" formControlName="RawMaterialId"
+                (valueChange)="OnRawMaterialChange($event)">
+              </kendo-dropdownlist>
+
+            </div>
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Supplier
+                    </em></span></label>
+              </div>
+              <kendo-dropdownlist name="Suppliers" class="kendo_custom_dropdown" [data]="supplierList" textField="Name"
+                valueField="Id" [defaultItem]="defaultItemComment" [valuePrimitive]="true" (valueChange)="SupplierChange($event)"
+                [(ngModel)]="formulationReviewRawMaterialsModel.SupplierId" formControlName="SupplierId">
+              </kendo-dropdownlist>
+            </div>
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+              </div>
+              <kendo-dropdownlist name="ManufacturerId" class="kendo_custom_dropdown" [data]="manufacturerList"
+                textField="Name" valueField="Id" [defaultItem]="defaultItemComment" (valueChange)="ManufacturersChange($event)"
+                [(ngModel)]="formulationReviewRawMaterialsModel.ManufacturerId" formControlName="ManufacturerId">
+              </kendo-dropdownlist>
+            </div>
+            
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em>Trade Name </em></span></label>
+              </div>
+              <kendo-dropdownlist name="TradeName" class="kendo_custom_dropdown" [data]="tradeNameList"
+                [defaultItem]="defaultItemComment" textField="Name" valueField="Id"  (valueChange)="tradeNameChange($event)"
+                [(ngModel)]="formulationReviewRawMaterialsModel.TradeName" formControlName="TradeName">
+              </kendo-dropdownlist>
+            </div>
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em>Sub-component</em></span></label>
+              </div>
+              <kendo-dropdownlist name="SubComponentId" class="kendo_custom_dropdown" [data]="subComponentList"
+                textField="Name" valueField="Id" [defaultItem]="defaultItemComment" (valueChange)="subComponentChange($event)"
+                [(ngModel)]="formulationReviewRawMaterialsModel.SubComponentId" formControlName="SubComponentId">
+              </kendo-dropdownlist>
+            </div>
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em>Market </em></span></label>
+              </div>
+              <kendo-dropdownlist name="Market" class="kendo_custom_dropdown" [data]="marketList"
+                [defaultItem]="defaultItemComment" textField="Name" valueField="Id"
+                [(ngModel)]="formulationReviewRawMaterialsModel.MarketId" formControlName="MarketId">
+              </kendo-dropdownlist>
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="combo-label">
+                <label for="exampleInputEmail1">
+                  <span>
+                    <em> Comment
+                      <span class="mandatory"></span>
+                      ({{totalCharCount}}/2000 Chars)
+                    </em>
+                  </span>
+                </label>
+              </div>
+              <textarea appInputTrim class="form-control" name="Comment" (keyup)="CommentMaxLengthCheck($event)"
+                [(ngModel)]="formulationReviewRawMaterialsModel.Comment"
+                [ngClass]="{ 'is-invalid': formulationReviewCommentForm.controls.Comment.errors?.required && formulationReviewCommentForm.controls.Comment.touched }"
+                required formControlName="Comment" required></textarea>
+              <div
+                *ngIf="formulationReviewCommentForm.controls.Comment.errors?.required && formulationReviewCommentForm.controls.Comment.touched"
+                class="invalid-feedback">
+                This field is required.</div>
+
+              <div class="invalid-feedback" *ngIf="maxLengthExceed"> Only 2000 characters allowed. </div>
+
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="row">
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em>Assign User</em></span></label>
+              </div>
+              <kendo-dropdownlist name="CommentAssignedTo" class="kendo_custom_dropdown" [data]="assignUserList"
+                textField="UserName" valueField="Id" [defaultItem]="defaultItemuser" formControlName="CommentAssignedTo"
+                [(ngModel)]="formulationReviewRawMaterialsModel.CommentAssignedTo">
+              </kendo-dropdownlist>
+            </div>
+            <div class="col-md-4">
+              <div class="combo-label">
+                <label for="HealthAuthority"><span><em>Due Date </em></span></label>
+              </div>
+              <kendo-datepicker name="EffectiveDate" #EffectiveDate class="" format="dd/MMM/yyyy"
+                formControlName="CommentDueDate" [(ngModel)]="formulationReviewRawMaterialsModel.CommentDueDate">
+              </kendo-datepicker>
+            </div>
+          </div>
+        </div>
+
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-outline-light btn-radius"
+        (click)="ViewCommentsGrid(ViewCommentModel)">Cancel</button>
+      <button type="submit" class="btn btn-primary btn-save btn-radius  ripple"
+        (click)="SaveReviewComment()">Save</button>
+
+    </div>
+  </div>
+  <!-- <div *ngIf="isLoading" class="k-loading-mask k-i-loading"></div> -->
+</ng-template>
+<ng-template #EditCommentModel let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">Edit Comments</h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="d-flex bd-highlight page_title_section p-0">
+      <div class="flex-grow-1 bd-highlight">
+        <h5 class="m-b-20 f-s-14"> <span class="text-muted"> Formulation Reference No. </span>
+          <span class=""> {{formulationInfoModel.FormulationReferenceNo}} , &nbsp; </span>
+          <span class="text-muted">Version No.</span> <span> {{formulationInfoModel.VersionNo}} </span>
+        </h5>
+      </div>
+      <div class="bd-highlight page_title_section_right">
+        <div class="bd-highlight">
+
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Raw Material Name and Code </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.RawMaterialName}}</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.ManufacturerName}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em> Supplier </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.SupplierName}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Trade Name</em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.TradeName}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Sub-component </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.SubComponentName}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Market</em></span></label>
+              <span>{{formulationReviewRawMaterialsModel.MarketName}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form id="frm_FormulationRawMaterials" [formGroup]="formulationReviewCommentForm">
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="combo-label">
+              <label data-balloon-pos="up" for="HealthAuthority"> <span> <em> Comment</em></span></label>
+            </div>
+            <textarea appInputTrim [readonly]='!AccessToERC' class="form-control" name="Comment"
+              [(ngModel)]="formulationReviewRawMaterialsModel.Comment" required formControlName="Comment"
+              maxlength="2000" [disabled]="IsClosed"></textarea>
+            <div
+              *ngIf="formulationReviewCommentForm.controls.Comment.errors?.required && formulationReviewCommentForm.controls.Comment.touched"
+              class="invalid-feedback">
+              This field is required.</div>
+          </div>
+        </div>
+      </div>
+    </form>
+    <div class="form-group">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="Close Comment"
+              [(ngModel)]="formulationReviewRawMaterialsModel.IsClosed" [disabled]="IsClosed || !AccessToERC">
+            <label class="form-check-label" for="inlineRadio1">Close Comment </label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Assign User</em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.CommentAssignedTo}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Due Date </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.CommentDueDate | date:'dd/MMM/yyyy'}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Comment Reply </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.CommentsReplied}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-light btn-radius"
+      (click)="ViewCommentsGrid(ViewCommentModel)">Cancel</button>
+    <button type="submit" class="btn btn-primary btn-save btn-radius  ripple" *ngIf="rmmapi.getRolePrivilege('RRC')" (click)="SaveReviewComment()"
+      [disabled]="IsClosed || !AccessToERC">Save</button>
+  </div>
+</ng-template>
+<ng-template #ReplyCommentModel let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">Reply Comments</h5>
+    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <div class="d-flex bd-highlight page_title_section p-0">
+      <div class="flex-grow-1 bd-highlight">
+        <h5 class="m-b-20 f-s-14"> <span class="text-muted"> Formulation Reference No. </span>
+          <span class=""> {{formulationInfoModel.FormulationReferenceNo}} , &nbsp; </span>
+          <span class="text-muted">Version No.</span> <span> {{formulationInfoModel.VersionNo}} </span>
+        </h5>
+      </div>
+      <div class="bd-highlight page_title_section_right">
+        <div class="bd-highlight">
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em> Raw Material Name and Code </em></span></label>
+              <span>{{formulationReviewRawMaterialsModel.RawMaterialName}}</span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.ManufacturerName}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em> Supplier </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.SupplierName}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Trade Name</em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.TradeName}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Sub-component </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.SubComponentName}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Market</em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.MarketName}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="combo-label">
+              <label data-balloon-pos="up" for="HealthAuthority"> <span> <em> Comment</em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.Comment}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="form-group view-form-group">
+      <div class="view-item">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Assign User</em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.CommentAssignedTo}} </span>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Due Date </em></span></label>
+              <span> {{formulationReviewRawMaterialsModel.CommentDueDate | date:'dd/MMM/yyyy'}} </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <form id="frm_FormulationRawMaterials" [formGroup]="formulationReviewCommentForm">
+      <div class="form-group">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="combo-label">
+              <label for="HealthAuthority"><span><em>Reply to Comment </em></span></label>
+            </div>
+            <textarea appInputTrim [readonly]='!AccessToRRC' class="form-control" name="Comment"
+              [(ngModel)]="formulationReviewRawMaterialsModel.CommentsReplied" required maxlength="2000"
+              formControlName="CommentsReplied" required [disabled]="IsClosed"></textarea>
+            <div
+              *ngIf="formulationReviewCommentForm.controls.CommentsReplied.errors?.required && formulationReviewCommentForm.controls.CommentsReplied.touched"
+              class="invalid-feedback">
+              This field is required.</div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-outline-light btn-radius"
+      (click)="ViewCommentsGrid(ViewCommentModel)">Cancel</button>
+    <button type="submit" class="btn btn-primary btn-save btn-radius  ripple" (click)="SaveReviewComment()"
+      [disabled]="IsClosed || !AccessToRRC">Save</button>
+  </div>
+</ng-template>

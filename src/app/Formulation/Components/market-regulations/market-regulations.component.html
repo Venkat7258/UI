@@ -1,0 +1,147 @@
+  <div class="row">
+    <div class="col">
+      <div class="content-grid">
+        <div class="formulation-card-body-vh">
+
+
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex bd-highlight page_title_section nav-pills">
+                <div class="bd-highlight flex-left">
+                  <span> <em> Market-wise Regulations </em> </span>
+                </div>
+                <div class="flex-grow-1 bd-highlight flex-left">
+                  <span></span>
+                </div>
+                <div class="bd-highlight">
+                  <span>
+                    <button type="submit" class="btn btn-outline-primary btn-radius" (click)="GotoDataDocumentCheck()">
+                      <i class="fa fa-long-arrow-right"> </i> Next </button>
+                  </span>
+                </div>
+              </div>
+
+              <div class="col-md-12">
+                <div class="row">
+                  <div class="col-md-2 side_nav_pills_section">
+                    <div class="sub-menu-nav">
+                      <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                        <a *ngFor="let item of formulationMarketsList; index as i" class="nav-link nav_a"
+                          [class]="i == 0 ? 'active' : ''" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home"
+                          role="tab" aria-controls="v-pills-home" aria-selected="true"
+                          (click)="MarketChange(item)">{{item.Name}}</a>
+                      </div>
+                    </div>
+
+                  </div>
+                  <div class="col-md-10 p-0">
+                    <ng-template #templateMarketText let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                    </ng-template>               
+                    <div kendoTooltip showOn="none" [tooltipTemplate]="templateMarketText" filter=".k-grid td" #tooltipMarket="kendoTooltip"
+                      (mouseover)="showTooltip($event, tooltipMarket)">
+                      <div class="tab-content" id="v-pills-tabContent">
+                        <kendo-grid class="k-grid-custom" [data]="rawMaterialList" [height]="" [pageable]="{
+                      buttonCount: this.searchFilter.buttonCount,
+                      info: true,
+                      type: type,
+                      pageSizes: true,
+                      previousNext: true,
+                      position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+                          [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort"
+                          (sortChange)="sortChange($event)" (pageChange)="pageChange($event)">
+                          <kendo-grid-column field="RawMaterialName" title="Raw Material" width=""> </kendo-grid-column>
+                          <kendo-grid-column field="Functions" title="Functions" width="160"></kendo-grid-column>
+                          <kendo-grid-column field="SupplierName" title="Supplier" width=""></kendo-grid-column>
+                          <kendo-grid-column field="ManufacturerName" title="Manufacturer" width=""></kendo-grid-column>
+                          <kendo-grid-column field="TradeName" title="Trade Name" width=""></kendo-grid-column>
+                          <kendo-grid-column field="SubComponents" title="Sub-components" width=""></kendo-grid-column>
+                          <kendo-grid-column title="Actions" width="90">
+                            <ng-template kendoGridCellTemplate let-dataItem>
+                              <div class="k-grid-action-list">
+                                <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+                                  (click)="EditRegulation(MarketRegulation,dataItem)" [disabled]="isDidabledButton">
+                                  <span class="fa-edit"></span></button>
+                              </div>
+                            </ng-template>
+                          </kendo-grid-column>
+                        </kendo-grid>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ng-template #MarketRegulation let-modal>
+        <div class="modal-header">
+          <h5 class="modal-title" id="modal-basic-title"> Market-wise Regulations </h5>
+          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body pt-2">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="flex-grow-1 bd-highlight">
+              <h5 class="f-s-14"> <span class="text-muted"> {{marketname}} : </span>
+                <span class=""> {{formTitle}} </span>
+              </h5>
+            </div>
+            <div class="bd-highlight page_title_section_right">
+              <div class="bd-highlight">
+
+              </div>
+            </div>
+          </div>
+          <ng-template #templateMarketRawMaterial let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+          </ng-template>
+          <div kendoTooltip showOn="none" [tooltipTemplate]="templateMarketRawMaterial" filter=".k-grid td" #tooltipReview="kendoTooltip"
+            (mouseover)="showTooltip($event, tooltipReview)">
+            <kendo-grid class="k-grid-custom" [data]="formulationRawMaterialSubComponentsList" [height]="">
+              <kendo-grid-column width="50">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                  <div class="form-check form-check-inline">
+                    <input type="radio" name="click" value="Filled" #subcomponent class="form-check-input"
+                      kendoRadioButton (change)="showClick(dataItem)">
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-column field="SubComponentName" title="Sub-component" width=""></kendo-grid-column>
+              <kendo-grid-column field="Functions" title="Functions" width=""> </kendo-grid-column>
+              <kendo-grid-column field="Impurities" title="Impurity?" width=""> </kendo-grid-column>
+              <kendo-grid-column field="SubComponentConcentrationInRawMaterial" title="Concentration in Finished Product"
+                format="##.0000000 \%" width=""> </kendo-grid-column>
+              <kendo-grid-column field="RegulationStatus" title="Regulation Status" width="">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                  <input [(ngModel)]="dataItem.RegulationStatus" kendoGridFocusable name="RegulationStatus"
+                    type="checkbox" (change)="FilledCheckBoxChange($event,dataItem)" />
+                  <label class="form-check-label" [for]="NotFilled"> Filled</label>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid>
+          </div>
+          <ng-container *ngIf="isRegulation">
+            <kendo-grid class="k-grid-custom" [data]="regulationList" [height]="410">
+              <kendo-grid-column field="RegulationName" title="Regulation" width=""> </kendo-grid-column>
+              <kendo-grid-column field="RegulationValue" title="Status" width="">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                  <input type="text" maxlength="1500" appInputTrim class="form-control" name="RegulationValue"
+                    [formControl]="GetFormControl(dataItem, column.field)" placeholder="" required>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid>
+          </ng-container>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-light btn-radius"
+            (click)="modal.dismiss('Cross click')">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-radius ripple" (click)="SaveRegulationMarkets()"
+            *ngIf="_rmmapi.getRolePrivilege('MF')">{{buttonTitle}}</button>
+
+        </div>
+      </ng-template>
+    </div>
+  </div>

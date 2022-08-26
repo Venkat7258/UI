@@ -1,0 +1,57 @@
+.row-tooltip {
+    position: relative;
+  }
+  
+  .custom-help-text {
+    background: #fff;
+    color: #575858;
+    border: solid 1px #d1d2d2;
+    border-radius: 0.25rem;
+    position: absolute;
+    display: none;
+    z-index: 1;
+    bottom: 150%;
+    left: 0;
+    padding: 10px;
+    font-weight: 500;
+    box-shadow: 0 0.5rem 1rem rgb(173 181 189 / 15%);
+    font-size: 13px;
+  }
+  .custom-help-text.bottom {
+    position: absolute;
+    z-index: 1;
+    top: 150%;
+    left: 0;
+    margin-top: 20px;
+    height: auto;
+  }
+  .custom-help-text-active .custom-help-text {
+    display: inline-table !important;
+  }
+  .fa-question-circle:before {
+    color: #777;
+  }
+  // .custom-help-text:after {
+  //   content: "";
+  //   position: absolute;
+  //   left: 50%;
+  //   top: 100%;
+  //   // margin-left: 10px;
+  //   border-width: 5px;
+  //   border-style: solid;
+  //   border-color: #283252 transparent transparent transparent;
+  // }
+  
+  .custom-help-text.bottom:after {
+    position: absolute;
+    z-index: 1;
+    left: 50%;
+    border-color: transparent transparent #575858 transparent;
+    bottom: 100%;
+    top: -10px;
+  }
+  span.getInfo.Inactive-fa-question {
+    position: absolute;
+    top: 10px;
+    left: 85px;
+  }

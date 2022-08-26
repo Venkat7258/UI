@@ -1,0 +1,394 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"> <a [routerLink]="['/Dashboard']"> Home </a></li>
+        <li class="breadcrumb-item"> <a [routerLink]="['/Masterdata']"> Master Data </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{moduleName}}</li>
+      </ol>
+    </nav>
+    <div class="nav-tabs-custom">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <a [class.active]="moduleName=='Sub-components'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+            href="javascript:void(0)" role="tab" (click)="tabchange('Sub-components')" aria-controls="nav-home"
+            aria-selected="true">
+            <span> Sub-components </span>
+          </a>
+          <a [class.active]="moduleName=='Import'" class="nav-link" id="nav-profile-tab" data-toggle="tab"
+            href="javascript:void(0)" role="tab" (click)="tabchange('Import')" role="tab" aria-controls="nav-profile"
+            aria-selected="false">
+            <span>Import </span>
+          </a>
+
+        </div>
+      </nav>
+    </div>
+
+
+    <div class="" id="nav-tabContent">
+      <div class="tab-pane fade active" [class.show]="moduleName=='Sub-components'" id="nav-tab1" role="tabpanel"
+        aria-labelledby="nav-home-tab">
+        <ng-container *ngIf="moduleName=='Sub-components'">
+
+          <div class="row">
+            <div class="col">
+              <div class="content-grid">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                      <div class="bd-highlight flex-left">
+                        <span> <em> Sub-Components </em> </span>
+                      </div>
+                      <div class="flex-grow-1 bd-highlight flex-left">
+                        <span> </span>
+                      </div>
+                      <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('ASC')">
+                        <button type="button" (click)="AddSubComponent(SubComponents)" data-toggle="modal"
+                          data-target="#myModal" class="btn btn-primary btn-radius ripple"> <i class="fa fa-plus"></i>
+                          Sub-component
+                        </button>
+                      </div>
+
+                    </div>
+                    <ng-template #template let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                    </ng-template>
+                    <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+                      (mouseover)="showTooltip($event)">
+                      <kendo-grid class="k-grid-custom" [data]="SubcomponentList" *ngIf="rmmapi.getRolePrivilege('SCL')"
+                        [pageable]="{
+                      buttonCount: this.searchFilter.buttonCount,
+                      info: true,
+                      type: type,                      
+                      previousNext: true,
+                      pageSizes: [50, 100, 150, 200, 300, 400, 500, 1000],
+                      position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+                        [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort"
+                        (sortChange)="sortChange($event)" (pageChange)="pageChange($event)">
+                        <kendo-grid-column field="Name" position="right" title="Name" width=""> </kendo-grid-column>
+                        <kendo-grid-column field="CASNumber" title="CAS Number" width=""></kendo-grid-column>
+                        <kendo-grid-column field="ECNumberOrKENumber" title="EC or KE Number" width="">
+                        </kendo-grid-column>
+                        <kendo-grid-column field="EUINCIName" title="EU INCI Name" width=""></kendo-grid-column>
+                        <kendo-grid-column field="USINCIName" title="US INCI Name" width=""></kendo-grid-column>
+
+                        <kendo-grid-column field="Functions" title="Sub-component Functions" width="">
+                          <ng-template kendoGridcellTemplate let-dataItem1>
+                            <div *ngIf="dataItem1.FunctionNames.length>20"><span>{{dataItem1.FunctionNames|
+                                slice:0:20}}</span>
+                              <span>&nbsp;<a href="javascript:void(0)" style="cursor:pointer;"
+                                  (click)="SubComponentFunctionNames(SubComponentFunctionNames1,dataItem1.FunctionNames)">more..</a></span>
+                            </div>
+                            <div *ngIf="dataItem1.FunctionNames.length &lt;=20">{{dataItem1.FunctionNames}}</div>
+                          </ng-template>
+                        </kendo-grid-column>
+                        <kendo-grid-column title="Actions" width="90">
+                          <ng-template kendoGridCellTemplate let-dataItem>
+                            <div class="k-grid-action-list">
+                              <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light "
+                                (click)="EditSubComponentsInfo(SubComponents,dataItem)"
+                                *ngIf="rmmapi.getRolePrivilege('MSC') || rmmapi.getRolePrivilege('VSC')"><span
+                                  class="fa-edit"></span></button>
+                              <button aria-label="Inactivate" data-balloon-pos="left"
+                                class="btn btn-sm btn-light btn-light-danger "
+                                (click)="InActiveModalInfo(InActiveModal, dataItem)"
+                                *ngIf="rmmapi.getRolePrivilege('ISC')"><span class="fa-ban"></span></button>
+                            </div>
+                          </ng-template>
+                        </kendo-grid-column>
+                      </kendo-grid>
+                    </div>
+                    <ng-template #SubComponents let-modal>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Sub-component' :"Edit
+                          Sub-component" }}</h5>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div>
+                        <form id="frm_SubComponents" name="form" [formGroup]="SubComponentform"
+                          (ngSubmit)="SaveSubComponent(SubComponentform.value)">
+                          <div class="modal-body">
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="Name"> <span><em> Sub-component Name <span
+                                            class="mandatory"></span></em></span></label>
+                                  </div>
+                                  <input type="text" trim="blur" maxlength="500" class="form-control" name="Name"
+                                    [(ngModel)]="model.Name" placeholder="" formControlName="Name"
+                                    [ngClass]="{ 'is-invalid': SubComponentform.submitted && SubComponentform.controls.Name.invalid }"
+                                    required (blur)="checkDuplicate()">
+                                  <div class="invalid-feedback"
+                                    *ngIf="SubComponentform.controls.Name.errors?.required && SubComponentform.controls.Name.touched">
+                                    This field is required.</div>
+                                  <div class="invalid-feedback" *ngIf="isDuplicateSubComponent">
+                                    {{this.env.ValidationMessages.Thisvaluealreadyexists}}</div>
+
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="CASNumber"><span><em> CAS Number <span class="mandatory"></span>
+                                        </em> </span></label>
+                                  </div>
+                                  <input type="text" trim="blur" maxlength="50" class="form-control" name="CASNumber"
+                                    [(ngModel)]="model.CASNumber" placeholder="" formControlName="CASNumber"
+                                    (keyup)="checkEmpty()"
+                                    [ngClass]="{ 'is-invalid': SubComponentform.submitted && SubComponentform.controls.CASNumber.invalid }">
+                                  <div class="invalid-feedback"
+                                    *ngIf="SubComponentform.controls.CASNumber.errors?.required && SubComponentform.controls.CASNumber.touched">
+                                    This field is required.</div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="ECNumberOrKENumber"><span> <em> EC or KE Number </em></span> </label>
+                                  </div>
+                                  <input type="text" trim="blur" maxlength="50" class="form-control"
+                                    name="ECNumberOrKENumber" [(ngModel)]="model.ECNumberOrKENumber" placeholder=""
+                                    formControlName="ECNumberOrKENumber">
+                                </div>
+
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="EUINCIName"><span><em> EU INCI Name </em></span></label>
+                                  </div>
+                                  <input type="text" trim="blur" maxlength="500" class="form-control" name="EUINCIName"
+                                    [(ngModel)]="model.EUINCIName" placeholder="" formControlName="EUINCIName">
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="USINCIName"><span><em> US INCI Name </em></span></label>
+                                  </div>
+                                  <input type="text" trim="blur" maxlength="500" class="form-control" name="USINCIName"
+                                    [(ngModel)]="model.USINCIName" placeholder="" formControlName="USINCIName">
+                                </div>
+
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-12">
+                                  <div class="combo-label">
+                                    <div class="row-tooltip">
+                                      <div class="custom-help-text bottom"> Mulitple Sub-components can be selected
+                                      </div>
+                                    </div>
+                                    <label> <span><em> Sub-component Functions <span class="mandatory"></span> <span
+                                            class="info_circle getInfo"></span> </em> </span> </label>
+                                  </div>
+                                  <kendo-multiselect name="Functions" [data]="SubComponentData" textField="Name"
+                                    valueField="Id" [(ngModel)]="model.Functions" formControlName="Functions" required
+                                    [kendoDropDownFilter]="filterSettings">
+                                  </kendo-multiselect>
+                                  <div
+                                    *ngIf="SubComponentform.controls.Functions.errors?.required && SubComponentform.controls.Functions.touched"
+                                    class="invalid-feedback">At least one selection is required.
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-light btn-radius"
+                              (click)="modal.dismiss('Cross click')">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-radius ripple"
+                              *ngIf="(rmmapi.getRolePrivilege('MSC') && rmmapi.getRolePrivilege('VSC'))|| (rmmapi.getRolePrivilege('MSC'))||(rmmapi.getRolePrivilege('VSC') && !rmmapi.getRolePrivilege('VSC'))">{{
+                              actionType ? 'Save'
+                              :"Update" }}</button>
+                          </div>
+                        </form>
+                      </div>
+                    </ng-template>
+                    <ng-template #SubComponentFunctionNames1 let-modal>
+                      <div class="modal-header">
+                        <h6 class="modal-title" id="modal-basic-title">Sub-component Functions</h6>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <ul>
+                          <li *ngFor="let items of subcomponentfunctions; let i = index">
+                            {{items}}
+                          </li>
+                        </ul>
+                      </div>
+                    </ng-template>
+
+                  </div>
+                </div>
+
+
+
+
+
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #InActiveModal let-modal>
+          <div class="modal-body modal-body-sm">
+            <div class="text-center">
+              <div class="avatar-md">
+                <div class="avatar-title">
+                  <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                </div>
+              </div>
+              <div class="row justify-content-center">
+                <h6> Are you sure you want to inactivate the Sub-component?</h6>
+              </div>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-no btn-radius"
+              (click)="modal.dismiss('Cross click')">No</button>
+            <button type="button" class="btn btn-outline-light btn-radius"
+              (click)="DeleteSubComponentsInfo(dataItem)">Yes</button>
+          </div>
+        </ng-template>
+      </div>
+      <div class="tab-pane fade active" [class.show]="moduleName=='Import'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='Import'">
+          <div class="row">
+            <div class="col">
+              <div class="content-grid">
+                <div class="card">
+                  <div class="card-body p-4">
+
+
+                    <div class="form-check form-check-inline">
+                      <input type="radio" name="import" value="Sub-component" #subcomponent [(ngModel)]="model.Import"
+                        class="form-check-input" kendoRadioButton>
+                      <label class="form-check-label" [for]="subcomponent">Ingredient Properties</label>
+                    </div>
+                    <div class="form-check form-check-inline m-b-10">
+                      <input type="radio" name="import" value="Regulations" id="" class="form-check-input" #regulations
+                        [(ngModel)]="model.Import" kendoRadioButton>
+                      <label class="form-check-label" [for]="regulations">Ingredient Regulations</label>
+                    </div>
+
+                    <!-- <div class="form-check form-check-inline">
+                    <button type="button" class="btn btn-light btn-sm"> <a href="#!"> Download Templete </a> </button>
+                  </div> -->
+                    <div class="row">
+                      <div class="col-md-4">
+                        <input #fileInputRef type="file" class="form-control kendo_custom_file"
+                          [(ngModel)]="model.ImportFile" (change)="getFileDetails($event)"
+                          accept=".xls,.xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" />
+                      </div>
+                      <button type="submit" *ngIf="rmmapi.getRolePrivilege('ISC')" class="btn btn-primary btn-radius"
+                        (click)="uploadList()">Upload</button>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div> <br>
+
+          <ng-container
+            *ngIf="(ChemicalRegulationList && ChemicalRegulationList.length > 0) || (IngredientRegulationList && IngredientRegulationList.length > 0)">
+            <div class="row" *ngIf="IngredientRegulationList && IngredientRegulationList.length > 0">
+              <div class="col">
+                <div class="content-grid">
+                  <div class="sub-component-grid-vh">
+                    <div class="card">
+                      <div class="">
+                        <div class="d-flex bd-highlight page_title_section">
+                          <div class="bd-highlight flex-left">
+                            <span> <em> Ingredient Regulations History </em> </span>
+                          </div>
+                          <div class="flex-grow-1 bd-highlight flex-left">
+                            <span> </span>
+                          </div>
+                          <div class="bd-highlight">
+                          </div>
+
+                        </div>
+
+                        <ng-template #template2 let-anchor>
+                          <span>{{ anchor.nativeElement.innerText }}</span>
+                        </ng-template>
+                        <kendo-grid kendoTooltip filter="td, th" [tooltipTemplate]="template2" class="k-grid-custom"
+                          [data]="IngredientRegulationList" [height]="">
+                          <kendo-grid-column field="Name" title="Ingredient Name"> </kendo-grid-column>
+                          <kendo-grid-column field="Country" title="Country"></kendo-grid-column>
+                          <kendo-grid-column field="Regulatory_Status" title="Regulatory Status">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="Regulatory_Description" title="Regulatory Description">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="LimitsAndRanges" title="Limit and Ranges">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="Restricition_Description" title="Restriction Description">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="Prohibition_Description" title="Prohibition Description">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="Labeling_Requirements" title="Labeling Requirements">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="Reason" title="Reason"></kendo-grid-column>
+                          <kendo-grid-column field="" title="" width="0"></kendo-grid-column>
+                        </kendo-grid>
+
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div> <br>
+            <div class="row" *ngIf="ChemicalRegulationList && ChemicalRegulationList.length > 0">
+              <div class="col">
+                <div class="content-grid Chemical-Regulations-History-vh">
+                  <div class="sub-component-grid-vh"> 
+                  <div class="card">
+                    <div class="">
+                      <div class="d-flex bd-highlight page_title_section">
+                        <div class="bd-highlight flex-left">
+                          <span> <em> Chemical Regulations History </em> </span>
+                        </div>
+                        <div class="flex-grow-1 bd-highlight flex-left">
+                          <span> </span>
+                        </div>
+                        <div class="bd-highlight">
+                        </div>
+                      </div>
+
+                      <ng-template #template3 let-anchor>
+                        <span>{{ anchor.nativeElement.innerText }}</span>
+                      </ng-template>
+                      <kendo-grid kendoTooltip filter="td, th" [tooltipTemplate]="template3" class="k-grid-custom"
+                        [data]="ChemicalRegulationList" [height]="410">
+                        <kendo-grid-column field="Name" title="Chemical Name"> </kendo-grid-column>
+                        <kendo-grid-column field="Country" title="Country"></kendo-grid-column>
+                        <kendo-grid-column field="ListedNotListed" title="Listed/NotListed">
+                        </kendo-grid-column>
+                        <kendo-grid-column field="HazardousControlledToxic"
+                          title="Classification (Hazardous / Contolled / Toxic/ etc.)"></kendo-grid-column>
+                        <kendo-grid-column field="RestrictionLimit" title="Restriction Limit">
+                        </kendo-grid-column>
+                        <kendo-grid-column field="Description" title="Description"></kendo-grid-column>
+                        <kendo-grid-column field="Reason" title="Reason"></kendo-grid-column>
+                        <kendo-grid-column field="" title="" width="0"></kendo-grid-column>
+                      </kendo-grid>
+
+                    </div>
+                  </div>
+                </div>
+                </div>
+
+              </div>
+            </div>
+          </ng-container>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

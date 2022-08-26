@@ -1,0 +1,50 @@
+@font-face {
+  font-family: "flaticon";
+  src: url("./flaticon.ttf?668cd2c18e8f30397a089dd03a4f27be") format("truetype"), url("./flaticon.woff?668cd2c18e8f30397a089dd03a4f27be") format("woff"), url("./flaticon.woff2?668cd2c18e8f30397a089dd03a4f27be") format("woff2"), url("./flaticon.eot?668cd2c18e8f30397a089dd03a4f27be#iefix") format("embedded-opentype"), url("./flaticon.svg?668cd2c18e8f30397a089dd03a4f27be#flaticon") format("svg");
+}
+i[class^=flaticon-]:before, i[class*=" flaticon-"]:before {
+  font-family: flaticon !important;
+  font-style: normal;
+  font-weight: normal !important;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.flaticon-pie-chart:before {
+  content: "\f101";
+}
+
+.flaticon-cell:before {
+  content: "\f102";
+}
+
+.flaticon-binder:before {
+  content: "\f103";
+}
+
+.flaticon-test-tube:before {
+  content: "\f104";
+}
+
+.flaticon-settings:before {
+  content: "\f105";
+}
+
+.flaticon-account:before {
+  content: "\f106";
+}
+
+.flaticon-lock:before {
+  content: "\f107";
+}
+
+.flaticon-edit:before {
+  content: "\f108";
+}
+
+.flaticon-ban:before {
+  content: "\f109";
+}/*# sourceMappingURL=flaticon.css.map */

@@ -1,0 +1,139 @@
+
+  <div class="row">
+    <div class="col">
+      <div class="content-grid"> 
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="bd-highlight flex-left">
+              <span> <em>  Regulation Properties  </em>  </span>
+            </div>
+            <div class="flex-grow-1 bd-highlight flex-left">
+              <span> </span>
+            </div>
+            <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('ARP')"> 
+              <button type="button" class="btn btn-primary btn-radius ripple"
+                (click)="RegulationPropertiesModal(RegulationProperties)"> <i class="fa fa-plus"> </i>   Regulation Property
+              </button>
+            </div>
+          </div>
+          <ng-template #template let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+        </ng-template>
+        <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+          <kendo-grid class="k-grid-custom" [data]="regulationPropertiesList" *ngIf="rmmapi.getRolePrivilege('RPL')"
+          [pageable]="{
+            buttonCount: this.searchFilter.buttonCount,
+              info: true,
+              type: type,
+              pageSizes: true,
+              previousNext: true,
+              position: position }" 
+          [pageSize]="this.searchFilter.pageSize" 
+          [skip]="this.searchFilter.pageSkip"
+          [sortable]="{ allowUnsort: false, mode: 'single'}"
+          [sort]="sort"
+          (sortChange)="sortChange($event)"
+          (pageChange)="pageChange($event)">
+            <kendo-grid-column field="Name" title="Regulation Property Name" width=""> </kendo-grid-column>
+            <kendo-grid-column field="ChecklistRegulationGroupName" title="Regulation Group Name" width="">
+            </kendo-grid-column>
+            <kendo-grid-column title="Actions" width="90">
+              <ng-template kendoGridCellTemplate let-dataItem>
+                <div class="k-grid-action-list"> 
+                <button aria-label="View/ Edit" data-balloon-pos="left"  class="btn btn-sm btn-light" *ngIf="rmmapi.getRolePrivilege('MRP') || rmmapi.getRolePrivilege('VRP')"
+                  (click)="EditRegulationPropertiesInfo(RegulationProperties,dataItem)"><span  class="fa-edit"></span></button>
+                <button aria-label="Inactivate" data-balloon-pos="left" class="btn btn-sm btn-light btn-light-danger" (click)="InActiveModalInfo(InActiveModal,dataItem)" *ngIf="rmmapi.getRolePrivilege('IRP')"><span class="fa-ban"></span></button>
+                    </div>
+
+              </ng-template>
+            </kendo-grid-column>
+          </kendo-grid>
+          </div>
+          <ng-template #RegulationProperties let-modal>
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Regulation Property' :"Edit Regulation Property"  }}</h5>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="frm_RegulationProperties" name="form" #RegulationPropertiesform="ngForm"
+              (ngSubmit)="RegulationPropertiesform.form.valid && AddRegulationPropertiesInfo(RegulationPropertiesform.value)">
+
+              <div class="modal-body ">
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <div class="combo-label">
+                        <label for="RegulationPropertiesName"> <span> <em> Regulation Property Name <span class="mandatory"> </span> </em> </span> </label>
+                      </div>
+                    
+                    <input type="text"  appInputTrim [disabled]="!rmmapi.getRolePrivilege('MRP') || rmmapi.getRolePrivilege('VRP')=='false' ? true : null" maxlength="100" class="form-control" name="RegulationPropertiesName" [(ngModel)]="regulationPropertiesModel.Name"
+                      placeholder="" #RegulationPropertiesName="ngModel"
+                      [ngClass]="{ 'is-invalid': RegulationPropertiesform.submitted && RegulationPropertiesName.invalid }"
+                      required  (blur)="IsCheckRegulationPropertiesInfo()">
+                      <div *ngIf="RegulationPropertiesform.submitted && RegulationPropertiesName.invalid" class="invalid-feedback">
+                        <div *ngIf="RegulationPropertiesName.errors.required"> This field is required.</div>
+                    </div>
+                    <div class="invalid-feedback" *ngIf="IsCheckRegulationProperties">{{this.env.ValidationMessages.Thisvaluealreadyexists}}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <div class="combo-label"> 
+                    <label for="RegulationGroups"> <span> <em> Regulation Group <span class="mandatory"> </span> </em> </span> </label> 
+                  </div>
+                    <kendo-dropdownlist name="RegulationGroups" [disabled]="!rmmapi.getRolePrivilege('MRP') || rmmapi.getRolePrivilege('VRP')=='false' ? true : null" class="kendo_custom_dropdown" [data]="AllRegulationGroups" textField="Name"
+                      [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="true"
+                      [(ngModel)]="regulationPropertiesModel.ChecklistRegulationGroupId"  #RegulationGroups="ngModel"   
+                      [ngClass]="{ 'is-invalid ng-invalid ng-touched': RegulationPropertiesform.submitted && RegulationGroups.invalid }"
+                      required>
+                    </kendo-dropdownlist>
+                      <div *ngIf="RegulationPropertiesform.submitted && RegulationGroups.invalid" class="invalid-feedback">
+                        <div *ngIf="RegulationGroups.errors.required">At least one selection is required.</div>
+                      </div>
+                    </div>
+                  </div>
+
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="modal.dismiss('Cross click')"
+                  class="btn btn-outline-light btn-radius">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-save btn-radius" *ngIf="(rmmapi.getRolePrivilege('MRP') && rmmapi.getRolePrivilege('VRP'))|| (rmmapi.getRolePrivilege('MRP'))||(rmmapi.getRolePrivilege('VRP') && !rmmapi.getRolePrivilege('VRP'))">{{ actionType ? 'Save' :"Update" }}</button>
+              </div>
+            </form>
+          </ng-template>
+          <ng-template #InActiveModal let-modal>
+            <!-- <div class="modal-header">
+              <h6 class="modal-title" id="modal-basic-title">Regulation Property</h6>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div> -->
+            <div class="modal-body modal-body-sm">
+              <div class="text-center">
+                <div class="avatar-md">
+                  <div class="avatar-title">
+                    <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                  </div>
+                  </div>
+                  <div class="row justify-content-center">
+                    <h6> Are you sure you want to inactivate the Checklist Regulation Property?
+                    </h6>
+                  </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary btn-no btn-radius"
+                (click)="modal.dismiss('Cross click')">No</button>
+              <button type="button" class="btn btn-outline-light btn-radius"
+                (click)="DeleteRegulationPropertiesInfo()">Yes</button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

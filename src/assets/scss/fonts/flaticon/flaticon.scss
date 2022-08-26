@@ -1,0 +1,61 @@
+$flaticon-font: "flaticon";
+
+@font-face {
+    font-family: $flaticon-font;
+    src: url("./flaticon.ttf?668cd2c18e8f30397a089dd03a4f27be") format("truetype"),
+url("./flaticon.woff?668cd2c18e8f30397a089dd03a4f27be") format("woff"),
+url("./flaticon.woff2?668cd2c18e8f30397a089dd03a4f27be") format("woff2"),
+url("./flaticon.eot?668cd2c18e8f30397a089dd03a4f27be#iefix") format("embedded-opentype"),
+url("./flaticon.svg?668cd2c18e8f30397a089dd03a4f27be#flaticon") format("svg");
+}
+
+i[class^="flaticon-"]:before, i[class*=" flaticon-"]:before {
+    font-family: flaticon !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+$flaticon-map: (
+    "pie-chart": "\f101",
+    "cell": "\f102",
+    "binder": "\f103",
+    "test-tube": "\f104",
+    "settings": "\f105",
+    "account": "\f106",
+    "lock": "\f107",
+    "edit": "\f108",
+    "ban": "\f109",
+);
+
+.flaticon-pie-chart:before {
+    content: map-get($flaticon-map, "pie-chart");
+}
+.flaticon-cell:before {
+    content: map-get($flaticon-map, "cell");
+}
+.flaticon-binder:before {
+    content: map-get($flaticon-map, "binder");
+}
+.flaticon-test-tube:before {
+    content: map-get($flaticon-map, "test-tube");
+}
+.flaticon-settings:before {
+    content: map-get($flaticon-map, "settings");
+}
+.flaticon-account:before {
+    content: map-get($flaticon-map, "account");
+}
+.flaticon-lock:before {
+    content: map-get($flaticon-map, "lock");
+}
+.flaticon-edit:before {
+    content: map-get($flaticon-map, "edit");
+}
+.flaticon-ban:before {
+    content: map-get($flaticon-map, "ban");
+}

@@ -1,0 +1,171 @@
+<div class="row">
+  <div class="col">
+    <div class="content-grid">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="bd-highlight flex-left">
+              <span> <em> Document Types </em> </span>
+            </div>
+            <div class="flex-grow-1 bd-highlight flex-left">
+              <span> </span>
+            </div>
+            <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('ADT')">
+              <button (click)="OpenDocumentTypePopup(DocumentType)" type="button" data-toggle="modal"
+                data-target="#myModal" class="btn btn-primary btn-radius ripple"> <i class="fa fa-plus"></i> Document Type
+              </button>
+            </div>
+          </div>
+          <ng-template #template let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+          </ng-template>
+          <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+            (mouseover)="showTooltip($event)">
+            <kendo-grid class="k-grid-custom" [data]="documentTypeList" *ngIf="rmmapi.getRolePrivilege('DTL')"
+              [pageable]="{
+            buttonCount: this.searchFilter.buttonCount,
+            info: true,
+            type: type,
+            pageSizes: true,
+            previousNext: true,
+            position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+              [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+              (pageChange)="pageChange($event)">
+              <kendo-grid-column field="DocumentType" title="Document Type" width=""> </kendo-grid-column>
+              <kendo-grid-column field="Mandatory" title="Mandatory?" width=""></kendo-grid-column>
+              <kendo-grid-column field="MarketSpecific" title="Market specific?" width=""></kendo-grid-column>
+              <kendo-grid-column field="MarketName" title="Market" width=""></kendo-grid-column>
+              <kendo-grid-column title="Actions" width="90">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                  <div class="k-grid-action-list">
+                    <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+                      *ngIf="rmmapi.getRolePrivilege('MDT') || rmmapi.getRolePrivilege('VDT')"
+                      (click)="EditDocumentType(DocumentType,dataItem)">
+                      <span class="fa-edit"></span></button>
+                    <button aria-label="Inactivate" data-balloon-pos="left"
+                      class="btn btn-sm btn-light btn-light-danger" *ngIf="rmmapi.getRolePrivilege('IDT')"
+                      (click)="InActiveModalInfo(InActiveModal,dataItem)"><span class="fa-ban"></span></button>
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid>
+          </div>
+          <ng-template #DocumentType let-modal>
+            <form [formGroup]="form" (ngSubmit)="onSubmit()">
+
+              <div class="modal-header">
+                <h5 class="modal-title" id="modal-basic-title">{{formTitle}}</h5>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="row">
+                  <div class="col-md-6">
+
+                    <div class="form-group">
+                      <div class="combo-label">
+                        <label for="DocumentType"> <span> <em> Document Type <span class="mandatory"> </span> </em>
+                          </span> </label>
+                      </div>
+                      <input type="text"  appInputTrim formControlName="documentType" class="form-control" maxlength="50"
+                        [ngClass]="{ 'is-invalid ': (submitted || f.documentType.touched)  && f.documentType.errors }"
+                        (blur)="CheckDuplicate()" />
+                      <div *ngIf="(submitted || f.documentType.touched ) && f.documentType.errors" class="invalid-feedback">
+                        <div *ngIf="f.documentType.errors.required">This field is required.</div>
+                      </div>
+                      <div *ngIf="isDuplicateDocumentType" class="invalid-feedback">{{env.ValidationMessages.Thisvaluealreadyexists }}</div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <div class="combo-label">
+                        <label for="Location"> <span> <em> Mandatory? <span class="mandatory"> </span> </em> </span>
+                        </label>
+                      </div>
+                      <kendo-dropdownlist name="mandatory" class="kendo_custom_dropdown" [data]="mandatoryItem"
+                        [ngClass]="{ 'is-invalid ng-invalid is-invalid ng-touched': (submitted || f.documentType.touched) && f.mandatory.errors }"
+                        textField="Name" valueField="Id" formControlName="mandatory" [valuePrimitive]="true"
+                        [defaultItem]="defaultItem">
+                      </kendo-dropdownlist>
+                      <div *ngIf="( submitted || f.documentType.touched) && f.mandatory.errors" class="invalid-feedback">
+                        <div *ngIf="f.mandatory.errors.required">This field is required.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <div class="combo-label">
+                        <label for="MarketSpecific"> <span> <em> Market specific? <span class="mandatory"> </span> </em>
+                          </span> </label>
+                      </div>
+                      <kendo-dropdownlist name="marketSpecific" class="kendo_custom_dropdown" [data]="mandatoryItem"
+                        textField="Name" valueField="Id" formControlName="marketSpecific" [valuePrimitive]="true"
+                        [ngClass]="{ 'is-invalid':(submitted || f.documentType.touched) && f.marketSpecific.errors }"
+                        [defaultItem]="defaultItem" (valueChange)="OnMarketSpecific($event)">
+                      </kendo-dropdownlist>
+                      <div *ngIf="(submitted || f.documentType.touched ) && f.marketSpecific.errors" class="invalid-feedback">
+                        <div *ngIf="f.marketSpecific.errors.required">This field is required.</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <div class="combo-label">
+                        <label for="Location"> <span> <em> Market </em> </span>
+                        </label>
+                      </div>
+                      <kendo-dropdownlist name="Market" class="kendo_custom_dropdown" [data]="allMarkets"
+                        (valueChange)="OnMarket($event)" textField="Name" valueField="Id" formControlName="marketId"
+                        [ngClass]="{ 'is-invalid ng-invalid is-invalid ng-touched': submitted && f.marketId.errors }"
+                        [valuePrimitive]="true" [disabled]="!isshowMarkets" [defaultItem]="defaultItem">
+                      </kendo-dropdownlist>
+                      <!-- <div *ngIf="submitted && showerrorMarkets" class="invalid-feedback">
+                        <div>Market is required</div>
+                      </div> -->
+                      <div *ngIf="(submitted || f.marketId.touched ) && f.marketId.errors" class="invalid-feedback">
+                        <div *ngIf="f.marketId.errors.required">This field is required.</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light btn-radius"
+                  (click)="modal.dismiss('Cross click')">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-save btn-radius ripple" *ngIf="(rmmapi.getRolePrivilege('MDT') && rmmapi.getRolePrivilege('VDT'))|| 
+                (rmmapi.getRolePrivilege('MDT'))||(rmmapi.getRolePrivilege('VDT') && !rmmapi.getRolePrivilege('VDT'))">
+                  {{buttonName}}
+                </button>
+              </div>
+            </form>
+          </ng-template>
+          <ng-template #InActiveModal let-modal>
+
+            <div class="modal-body modal-body-sm">
+              <div class="text-center">
+                <div class="avatar-md">
+                  <div class="avatar-title">
+                    <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <h6> Are you sure you want to inactivate the Document Type?</h6>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary btn-no btn-radius ripple"
+                (click)="modal.dismiss('Cross click')">No</button>
+              <button type="button" class="btn btn-outline-light btn-radius" (click)="DeleteDocumentType()">Yes</button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

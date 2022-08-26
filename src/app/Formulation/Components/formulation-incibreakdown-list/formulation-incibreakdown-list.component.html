@@ -1,0 +1,174 @@
+<div class="view-panel">
+  <div class="row">
+    <div class="col">
+      <div class="content-grid">
+        <div class="formulation-card-body-vh">
+          <div class="content-grid">
+            <div class="card">
+              <div class="card-body">
+                <div class="d-flex bd-highlight page_title_section">
+                  <div class="bd-highlight flex-left">
+                    <span> <em> Ingredient List</em></span>
+                  </div>
+                  <div class="flex-grow-1 bd-highlight flex-left">
+                    <span> </span>
+                  </div>
+                  <div class="bd-highlight">
+                    <button (click)="BtnManagePriority(ManagePriority, 'xl')" type="button"
+                      class="btn btn-primary btn-radius" *ngIf="_rmmapi.getRolePrivilege('MF')" data-toggle="modal"
+                      data-target="#myModal2" [disabled]="isManagePriority"> Manage Priority</button>
+                    <button (click)="ExportToExcel()" type="button" class="btn btn-outline-primary btn-radius"
+                      data-toggle="modal" *ngIf="_rmmapi.getRolePrivilege('EINCI')" data-target="#myModal2"
+                      [disabled]="isExportToExcel"> <i class="fa fa-file-excel-o" aria-hidden="true"></i> Export To Excel</button>
+                    <button type="button" class="btn btn-outline-primary btn-radius"
+                      [disabled]="!isGotoDocumentTrackingt" (click)="GotoDocumentTracking()"><i
+                        class="fa fa-long-arrow-right"> </i> Next</button>
+                  </div>
+                </div>
+                <ng-template #template let-anchor>
+                  <span>{{ anchor.nativeElement.innerText }}</span>
+                </ng-template>
+                <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+                  (mouseover)="showTooltip($event)">
+                  <div class="tab-content" id="v-pills-tabContent" *ngIf="!isSubcomponent">
+                    <kendo-grid class="k-grid-hierarchy-custom" [data]="formulationInciList" [height]=""
+                      [navigable]="true">
+                      <kendo-grid-checkbox-column width="30">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                          <input type="checkbox" [(ngModel)]="dataItem.IsCheck" (change)="checkboxChange($event)"
+                            class="{{dataItem.FormulationRawMaterialSubComponents == null ? 'k-disabled' : ''}}" />
+                        </ng-template>
+                      </kendo-grid-checkbox-column>
+                      <kendo-grid-column field="RawMeterialName" title="Raw Material Name and Code" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="FunctionName" title="Functions" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="SupplierName" title="Supplier" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="ManufacturerName" title="Manufacturer" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="TradeName" title="Trade Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="Concentration" title="Concentration (%)" width=""> </kendo-grid-column>
+                      <div *kendoGridDetailTemplate="let dataItem">
+                        <kendo-grid class="k-grid-custom" [data]="dataItem.FormulationRawMaterialSubComponents"
+                          [height]="" [navigable]="true" kendoGridFocusable>
+                          <kendo-grid-column field="SubComponentName" title="Sub-component Name" width="">
+                          </kendo-grid-column>
+                          <kendo-grid-column field="EUINCIName" title="EU INCI Name" width=""></kendo-grid-column>
+                          <kendo-grid-column field="USINCIName" title="US INCI Name" width=""></kendo-grid-column>
+                          <kendo-grid-column field="FuntionName" title="Functions" width=""> </kendo-grid-column>
+                          <kendo-grid-column field="CASNumber" title="CAS Number" width=""></kendo-grid-column>
+                          <kendo-grid-column field="ECNumberOrKENumber" title="EC or KE Number" width=""></kendo-grid-column>
+                          <kendo-grid-column field="Concentration" title="Concentration (%) (of Sub-Component in the finished Product)"
+                            width="">
+                            <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                              <input type="number" step="0.1" maxlength="100" appInputTrim class="form-control"
+                              [disabled]="!isSaveIngredientList"
+                                name="RegulationValue" (keyup)="ValidateInputIngredientTab($event,dataItem)"
+                                [(ngModel)]="dataItem.Concentration">
+                            </ng-template>
+                          </kendo-grid-column>
+                        </kendo-grid>
+                      </div>
+                    </kendo-grid>
+                  </div>
+                  <div class="tab-content" id="v-pills-tabContent" *ngIf="isSubcomponent">
+                    <kendo-grid class="k-grid-custom" [data]="formulationRawMaterialSubComponents" [height]="">
+                      <kendo-grid-column field="Priority" title="Priority" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="RawMeterialName" title="Raw Material Name and Code" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="SubComponentName" title="Sub-component Name" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="EUINCIName" title="EU INCI Name" width=""></kendo-grid-column>
+                      <kendo-grid-column field="USINCIName" title="US INCI Name" width=""></kendo-grid-column>
+                      <kendo-grid-column field="CASNumber" title="CAS Number" width=""></kendo-grid-column>
+                      <kendo-grid-column field="FuntionName" title="Functions" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="Concentration" title="Concentration (%) (of Sub- Component in the finished Product)" width="">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                          <input type="number" step="0.1" maxlength="100" appInputTrim class="form-control"
+                          [disabled]="!isSaveIngredientList"
+                            name="RegulationValue" [(ngModel)]="dataItem.Concentration"
+                            (keyup)="ValidateInputIngredientTab($event,dataItem)" (onChange)="ChangePriority(dataItem)"
+                            style="width: 94%;" required>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                    <!-- <div *ngIf="isCommentLoading" class="k-loading-mask k-i-loading"></div> -->
+                  </div>
+                </div>
+                <!-- <div *ngIf="isLoading" class="k-i-loading"></div> -->
+                <div class="modal-footer p-0">
+                  <button type="submit" class="btn btn-outline-primary btn-radius" [disabled]="!isSendforReview" *ngIf="_rmmapi.getRolePrivilege('INCI')"
+                    (click)="SendforReview('ILS')">Send for Review</button>
+                  <button type="submit" class="btn btn-outline-primary btn-radius" *ngIf="isApproveInciList" [disabled]='!AccessToRINCI'
+                    (click)="SendforReview('ILA')">Approve List</button>
+                  <button type="submit" class="btn btn-outline-primary btn-radius" [disabled]="!isGenerateDetailsList" *ngIf="_rmmapi.getRolePrivilege('MF')"
+                    (click)="GenerateDetailsList()">Generate List</button>
+                  <button type="submit" class="btn btn-outline-primary btn-radius" [disabled]="!isReDo" *ngIf="_rmmapi.getRolePrivilege('MF')"
+                    (click)="BtnManagePriority(ReDoConfirmation, 'sm')">Redo List</button>
+                  <button type="submit" class="btn btn-outline-primary btn-radius" [disabled]="!isSaveIngredientList" *ngIf="_rmmapi.getRolePrivilege('MF')"
+                    (click)="SaveIngredientList()">Save List</button>
+                </div>
+
+                <ng-template #ManagePriority let-modal>
+                  <div class="modal-header">
+                    <h5 class="modal-title" id="modal-basic-title">Manage Sub-component Priority</h5>
+                    <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                    <kendo-grid class="k-grid-custom" [data]="formulationRawMaterialSubComponents" [height]="410"
+                      [navigable]="true" kendoGridFocusable>
+                      <kendo-grid-column field="RawMeterialName" title="Raw Material Name" width="150">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="SubComponentName" title="Sub-component Name" width="150">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="CASNumber" title="CAS Number" width="100">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="Concentration" title="Concentration (%)" width="100">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="OldPriority" title="Existing Priority" width="100">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="Priority" title="New Priority" width="100">
+                        <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                          <input type="text" appInputTrim class="form-control" name="NewPriority"
+                            [(ngModel)]="dataItem.Priority" (change)="ChangePriority(dataItem, rowIndex)">
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-light btn-radius"
+                      (click)="modal.dismiss('Cross click')">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-save btn-radius  ripple"
+                      (click)="SaveIngredientList()">Save</button>
+                  </div>
+                </ng-template>
+
+                <ng-template #ReDoConfirmation let-modal>
+                  <div class="modal-body modal-body-sm">
+                    <div class="text-center">
+                      <div class="avatar-md">
+                        <div class="avatar-title">
+                          <img class="inacive" src="../../../assets/img/redo.svg" width="50">
+                        </div>
+                      </div>
+                      <div class="row justify-content-center">
+                        <h6> Are you sure you want to redo Ingredient List? </h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-no ripple btn-radius"
+                      (click)="modal.dismiss('Cross click')">No</button>
+                    <button type="button" class="btn btn-outline-light btn-radius" (click)="ReDo()">Yes</button>
+                  </div>
+                </ng-template>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

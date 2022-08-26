@@ -1,0 +1,20 @@
+$primary: #000;
+$sidebarcolor: #e9ecef;
+$hover-color: #e9ecef;
+$codecolor: #000;
+$dark-value-map: (
+    name: "dark",
+    text-color: $gray-800,
+    background-color: $white,
+    active-color: $primary,
+    button-color: $primary,
+    sidebar-color: $sidebarcolor,
+    hover-color: $hover-color,
+    code-color: $codecolor,
+    button-text-color: $white,
+    button-bg-disable: $gray-200,
+    button-border-disable: $gray-400,
+    button-text-color-disable:$gray-700,
+
+
+);

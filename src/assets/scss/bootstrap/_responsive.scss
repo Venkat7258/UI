@@ -1,0 +1,84 @@
+// Extra small devices (portrait phones, less than 576px)
+@media (max-width: 575.98px) {
+    .login_container {
+        margin: 0 !important;
+        .panel {
+            .left_panel {
+                background: #5b229f;
+                height: calc(100vh - 0px) !important;
+            }
+            .login_section {
+                .right_panel {
+                    padding: 30px 100px !important;
+        height: calc(100vh - 150px) !important;
+                }
+            }
+        }
+    }
+
+    
+   
+}
+
+// Small devices (landscape phones, 576px and up)
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .login_container {
+        margin: 0 !important;
+        .panel {
+            .left_panel {
+                background: #5b229f;
+                height: calc(100vh - 0px) !important;
+            }
+            .login_section {
+                .right_panel {
+                    padding: 30px 100px !important;
+        height: calc(100vh - 150px) !important;
+                }
+            }
+        }
+    }
+}
+
+
+// Medium devices (tablets, 768px and up)
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .login_container {
+        margin: 0 !important;
+        .panel {
+            .left_panel {
+                background: #5b229f;
+                height: calc(100vh - 0px) !important;
+            }
+            .login_section {
+                .right_panel {
+                    padding: 100px 50px !important;
+        height: calc(100vh - 0px) !important;
+                }
+            }
+        }
+    }
+}
+
+// Large devices (desktops, 992px and up)
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .login_container {
+        margin: 0 !important;
+        .panel {
+            .left_panel {
+                background: #5b229f;
+                height: calc(100vh - 0px) !important;
+            }
+            .login_section {
+                .right_panel {
+                    padding: 100px 100px !important;
+        height: calc(100vh - 0px) !important;
+                }
+            }
+        }
+    }
+}
+
+// Extra large devices (large desktops, 1200px and up)
+@media (min-width: 1200px) {
+    
+}

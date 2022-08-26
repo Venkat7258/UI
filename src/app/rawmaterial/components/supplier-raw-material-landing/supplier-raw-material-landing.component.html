@@ -1,0 +1,253 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"><a [routerLink]="['/Dashboard']">Home</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Raw Materials</li>
+      </ol>
+    </nav>
+    <div class="row">
+      <div class="col">
+        <div class="kendo-landing-grid">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex bd-highlight page_title_section">
+                <div class="bd-highlight flex-left">
+                  <span> <em> Raw Materials </em> </span>
+                </div>
+                <div class="flex-grow-1 bd-highlight flex-left">
+                  <span></span>
+                </div>
+                <div class="bd-highlight">
+                  <span>
+                    <div class="form-check form-check-inline">
+                      <div class="grid-check-box-actions">
+                        <input class="form-check-input form-check-custom" type="checkbox"
+                          (change)="ShowInactiveRawMaterials($event)" id="" value="">
+                        <label class="form-check-label" for="inlineCheckbox1"> <span> <em>Show Inactive Raw
+                              Materials</em>
+                          </span></label>
+                      </div>
+                    </div>
+
+                    <button *ngIf="rmmapi.getRolePrivilege('ARM')" type="button" [disabled]="ShowInactiveRawMaterial" (click)="RawMaterialModal(RawMaterial)"
+                      class="btn btn-primary btn-radius" data-toggle="modal" data-target="#myModal">
+                      <i class="fa fa-plus"></i> Raw Material </button>
+
+                  </span>
+                </div>
+              </div>
+
+              <ng-template #template let-anchor>
+                <span>{{ anchor.nativeElement.innerText }}</span>
+              </ng-template>
+              <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+                (mouseover)="showTooltip($event)">
+                <kendo-grid class="k-grid-custom" [data]="rawMaterialDetailsInfo" [height]="" [pageable]="{
+                                              buttonCount: this.searchFilter.buttonCount,
+                                              info: true,
+                                              type: 'numeric',
+                                              pageSizes: [10,20,50,100,200],
+                                              previousNext: true,
+                                  position: 'bottom' }" [pageSize]="searchFilter.pageSize" [skip]="searchFilter.pageSkip"
+                  [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+                  (pageChange)="pageChange($event)">
+                  <kendo-grid-column field="RawMaterialName" title="Raw Material Name and Code" width="">
+                  </kendo-grid-column>
+                  <kendo-grid-column field="SupplierName" title="Supplier" width=""> </kendo-grid-column>
+                  <kendo-grid-column field="ManufacturerName" title="Manufacturer" width=""></kendo-grid-column>
+               
+                  <kendo-grid-column field="TradeName" title="Trade Name" width=""></kendo-grid-column>
+                  <kendo-grid-column field="RawMaterialFunctionName" title="Functions" width=""></kendo-grid-column>
+                  <kendo-grid-column field="StatusName" title="Status" width="">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                      <div class="k-grid-status-list">
+                        <div [class]="dataItem.StatusName | TransformationStatuCodeColor : 'supplierRawMaterial'  ">
+                          {{dataItem.StatusName }}
+                        </div>
+                      </div>
+                    </ng-template>
+                  </kendo-grid-column>
+                  <kendo-grid-column title="Actions" width="100">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                      <div class="k-grid-action-list">
+                        <button *ngIf="AccessToVRM" aria-label="View/ Edit" data-balloon-pos="left"
+                          [disabled]="dataItem.IsDeleted" class="btn btn-sm btn-light"
+                          (click)="EditRawMaterialInfo(RawMaterial,dataItem)"><span class="fa-edit"></span>
+                        </button>
+                        <button *ngIf="AccessToIRM"
+                          [attr.aria-label]="ShowInactiveRawMaterial ? 'Reactivate' : 'Inactivate'"
+                          data-balloon-pos="left" class="btn btn-sm btn-light btn-light-danger"
+                          (click)="InActiveModalInfo(InActiveModal,dataItem)"><span
+                            [ngClass]="dataItem.IsDeleted ? 'fa-check btn-light' : 'fa-ban btn-light-danger'"></span></button>
+                      </div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid>
+
+              </div>
+              <ng-template #RawMaterial let-modal>
+                <div class="modal-header">
+                  <h5 class="modal-title" id="modal-basic-title">
+                    {{ actionType ? 'Add Raw Material' :"Edit Raw Material"}}</h5>
+                  <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+                <form id="frm_RawMaterial" name="form" #RawMaterialform="ngForm"
+                  (ngSubmit)="RawMaterialform.form.valid && AddRawMaterialInfo(RawMaterialform.value)">
+                  <!-- Modal body -->
+                  <div class="modal-body">
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="HealthAuthority"> <span> <em> Raw Material Name and Code <span
+                                    class="mandatory"> </span> </em>
+                              </span> </label>
+                          </div>
+                          <kendo-dropdownlist name="RawMaterial" class="kendo_custom_dropdown"
+                            [data]="AllRawMaterialsInfo" textField="Name" [defaultItem]="rawMaterialsDefaultItem"
+                            valueField="Id" [valuePrimitive]="true" [(ngModel)]="rawMaterialModel.RawMaterialId"
+                            #RawMaterial="ngModel" (valueChange)="IsCheckRawMaterialInfo()"
+                            [ngClass]="{ 'is-invalid ng-invalid ng-touched': RawMaterialform.submitted && RawMaterial.invalid }"
+                            required>
+                          </kendo-dropdownlist>
+                          <div *ngIf="RawMaterialform.submitted && RawMaterial.invalid" class="invalid-feedback">
+                            <div *ngIf="RawMaterial.errors.required"> {{env.ValidationMessages.requiredRawMaterialMsg}}
+                            </div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="HealthAuthority"><span><em>Supplier <span class="mandatory">
+                                  </span></em></span></label>
+                          </div>
+                          <kendo-dropdownlist name="Suppliers" class="kendo_custom_dropdown" [data]="AllSuppliersInfo"
+                            textField="Name" [defaultItem]="supplierDefaultItem" valueField="Id" [valuePrimitive]="true"
+                            (valueChange)="IsCheckRawMaterialInfo()" [(ngModel)]="rawMaterialModel.SupplierId"
+                            #Suppliers="ngModel"
+                            [ngClass]="{ 'is-invalid ng-invalid ng-touched': RawMaterialform.submitted && Suppliers.invalid }"
+                            required>
+                          </kendo-dropdownlist>
+                          <div *ngIf="RawMaterialform.submitted && Suppliers.invalid" class="invalid-feedback">
+                            <div *ngIf="Suppliers.errors.required">{{env.ValidationMessages.requiredRawMaterialMsg}}
+                            </div>
+
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="HealthAuthority"> <span> <em> Manufacturer <span class="mandatory"> </span>
+                                </em> </span>
+                            </label>
+                          </div>
+                          <kendo-dropdownlist name="Manufacturer" class="kendo_custom_dropdown"
+                            [data]="AllManufacturersInfo" textField="Name" [defaultItem]="manufacturerDefaultItem"
+                            valueField="Id" [valuePrimitive]="true" (valueChange)="IsCheckRawMaterialInfo()"
+                            [(ngModel)]="rawMaterialModel.ManufacturerId" #Manufacturer="ngModel"
+                            [ngClass]="{ 'is-invalid ng-invalid ng-touched': RawMaterialform.submitted && Manufacturer.invalid }"
+                            required>
+                          </kendo-dropdownlist>
+                          <div *ngIf="RawMaterialform.submitted && Manufacturer.invalid" class="invalid-feedback">
+                            <div *ngIf="Manufacturer.errors.required">{{env.ValidationMessages.requiredRawMaterialMsg}}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-4">
+                          <div class="combo-label">
+                            <label for="exampleInputPassword1"><span><em> Trade Name <span class="mandatory"> </span>
+                                </em></span></label>
+                          </div>
+                          <input type="text" appInputTrim class="form-control" name="TradeName"
+                            [(ngModel)]="rawMaterialModel.TradeName" placeholder="" #TradeName="ngModel"
+                            (blur)="IsCheckRawMaterialInfo()"
+                            [ngClass]="{ 'is-invalid': RawMaterialform.submitted && TradeName.invalid }" maxlength="100"
+                            required>
+                          <div *ngIf="RawMaterialform.submitted && TradeName.invalid" class="invalid-feedback">
+                            <div *ngIf="TradeName.errors.required">
+                              {{env.ValidationMessages.requiredRawMaterialMsg}}</div>
+                          </div>
+                          <div class="invalid-feedback" *ngIf="IsCheckRawMaterial">
+                            {{env.ValidationMessages.requiredRawMaterialAEMsg}}
+                          </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="combo-label">
+                            <div class="row-tooltip">
+                              <div class="custom-help-text bottom"> Multiple functions can be selected </div>
+                            </div>
+                            <label for="HealthAuthority"> <span> <em> Functions
+                                  <span class="mandatory">
+                                  </span> <span class="info_circle getInfo"></span> </em>
+                              </span>
+                            </label>
+                          </div>
+                          <kendo-multiselect name="Function" [data]="AllFunctionsInfo"
+                            [kendoDropDownFilter]="filterSettings"
+                            class="kendo_custom_dropdown kendo_custom_multiselect" textField="Name" valueField="Id"
+                            [class]='RawMaterialform.submitted && Function.invalid ? "is-invalid" : ""'
+                            [(ngModel)]="rawMaterialModel.RawMaterialFunctions" #Function="ngModel"
+                            [ngClass]="{ 'is-invalid ng-invalid ng-touched': RawMaterialform.submitted && Function.invalid }"
+                            required>
+                            <!-- [ngClass]="{ 'is-invalid': rawMaterialModel.controls.Function.errors?.required  }" -->
+                            <!-- [ngClass]="{ 'is-invalid': FormulationVersionform.submitted && Markets.invalid }"  -->
+                          </kendo-multiselect>
+                          <div *ngIf="RawMaterialform.submitted && Function.invalid" class="invalid-feedback">
+                            <div *ngIf="Function.errors.required">
+                              {{env.ValidationMessages.requiredMultiSelectRawMaterialMsg}}</div>
+                          </div>
+                        </div>
+                     
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" (click)="modal.dismiss('Cross click')"
+                      class="btn btn-outline-light btn-radius">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-save btn-radius">{{ actionType ? 'Save' :"Update"
+                      }}
+                    </button>
+                  </div>
+                </form>
+              </ng-template>
+              <ng-template #InActiveModal let-modal>
+                <div>
+                  <div class="modal-body modal-body-sm">
+                    <div class="text-center">
+                      <div class="avatar-md">
+                        <div class="avatar-title">
+                          <!-- <img class="inacive" src="../../../assets/img/check.svg" width="50"> -->
+                          <img class="inacive"
+                            [src]="ShowInactiveRawMaterial ? '../../../assets/img/check.svg' : '../../../assets/img/ban.svg' "
+                            width="50">
+                        </div>
+                      </div>
+                      <div class="row justify-content-center">
+                        <h6 *ngIf="!ShowInactiveRawMaterial"> Are you sure you want to inactivate Raw Material? </h6>
+                        <h6 *ngIf="ShowInactiveRawMaterial"> Are you sure you want to reactivate Raw Material? </h6>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" class="btn btn-primary btn-no btn-radius"
+                      (click)="modal.dismiss('Cross click')">No</button>
+                    <button *ngIf="!ShowInactiveRawMaterial" title="InActivate" type="button"
+                      class="btn btn-outline-light btn-radius"
+                      (click)="ManageSupplierRawMaterialDetailsStatus('inactive')">Yes</button>
+                    <button *ngIf="ShowInactiveRawMaterial" type="button" class="btn btn-outline-light btn-radius"
+                      title="Reactivate" (click)="ManageSupplierRawMaterialDetailsStatus('reactive')">Yes</button>
+                  </div>
+                </div>
+              </ng-template>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

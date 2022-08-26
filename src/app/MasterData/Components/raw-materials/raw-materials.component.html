@@ -1,0 +1,242 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"> <a [routerLink]="['/Dashboard']"> Home </a></li>
+        <li class="breadcrumb-item"> <a [routerLink]="['/Masterdata']"> Master Data </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{moduleName}}</li>
+      </ol>
+    </nav>
+    <div class="nav-tabs-custom"> 
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a [class.active]="moduleName=='Raw Materials'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="Tabchange('Raw Materials')" role="tab" aria-controls="nav-home">
+          <span> Raw Materials </span>
+        </a>
+        <a [class.active]="moduleName=='Suppliers'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="Tabchange('Suppliers')" role="tab" aria-controls="nav-home">
+          <span> Suppliers </span>
+        </a>
+        <a [class.active]="moduleName=='Manufacturers'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="Tabchange('Manufacturers')" role="tab" aria-controls="nav-home">
+          <span> Manufacturers </span>
+        </a>
+        <a [class.active]="moduleName=='DocumentTypes'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="Tabchange('DocumentTypes')" role="tab" aria-controls="nav-home">
+          <span> Document Types </span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade active" [class.show]="moduleName=='Raw Materials'" id="nav-tab1" role="tabpanel"
+        aria-labelledby="nav-home-tab">
+        <ng-container *ngIf="moduleName=='Raw Materials'">
+          <div class="row">
+            <div class="col">
+              <div class="content-grid">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                      <div class="bd-highlight flex-left">
+                        <span> <em>  Raw Materials  </em> </span>
+                      </div>
+                      <div class="flex-grow-1 bd-highlight flex-left">
+                        <span> </span>
+                      </div>
+                      <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('MARM')">
+                        <button (click)="OpenRawMaterialPopUp(RawMaterial)" type="button" data-toggle="modal"
+                          data-target="#myModal" class="btn btn-primary btn-radius ripple"> <i class="fa fa-plus"></i>
+                          Raw Material
+                        </button>
+                      </div>
+                    </div>
+                    <ng-template #template let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+                  <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+                    <kendo-grid class="k-grid-custom" [data]="rawMaterialsList" *ngIf="rmmapi.getRolePrivilege('MVRM')"
+                    [pageable]="{
+                      buttonCount: this.searchFilter.buttonCount,
+                        info: true,
+                        type: type,
+                        pageSizes: true,
+                        previousNext: true,
+                        position: position }" 
+                    [pageSize]="this.searchFilter.pageSize" 
+                    [skip]="this.searchFilter.pageSkip"
+                    [sortable]="{ allowUnsort: false, mode: 'single'}"
+                    [sort]="sort"
+                    (sortChange)="sortChange($event)"
+                    (pageChange)="pageChange($event)">
+                      <kendo-grid-column field="Name" title="Raw Material Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="Code" title="Code" width=""></kendo-grid-column>
+                      <kendo-grid-column field="Description" title="Description" width=""></kendo-grid-column>
+                      <kendo-grid-column title="Actions" width="90">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list">
+                            <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light "
+                              (click)="EditRawMaterial(RawMaterial,dataItem)" *ngIf="rmmapi.getRolePrivilege('MMR')||rmmapi.getRolePrivilege('MVR')">
+                              <span class="fa-edit"></span></button>
+                            <button aria-label="Inactivate" data-balloon-pos="left"
+                              class="btn btn-sm btn-light btn-light-danger " *ngIf="rmmapi.getRolePrivilege('MIRM')"
+                              (click)="InActiveModalInfo(InActiveModal, dataItem)"><span class="fa-ban"></span></button>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                    </div>
+                    <ng-template #RawMaterial let-modal>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modal-basic-title">{{formTitle}}</h5>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="frm_Markets" name="form" [formGroup]="rawMaterialsform">
+                          <div class="form-group">
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="combo-label">
+                                  <label for="SupplierName"> <span> <em> Raw Material Name <span class="mandatory">
+                                        </span> </em> </span> </label>
+                                </div>
+                                <input type="text"  appInputTrim class="form-control" name="SuppliersName"
+                                [ngClass]="{'is-invalid':(rawMaterialsform.controls.name.errors?.required) && (rawMaterialsform.submitted || rawMaterialsform.controls.name.touched) }"
+                                [(ngModel)]="Model.Name"
+                                  formControlName="name" placeholder="" (blur)="CheckDuplicate()">
+                                <div
+                                  *ngIf="!isDuplicate && (rawMaterialsform.controls.name.errors?.required) && (rawMaterialsform.submitted || rawMaterialsform.controls.name.touched)"
+                                  class="invalid-feedback">
+                                  This field is required.</div>
+                                <div *ngIf="isDuplicate" class="invalid-feedback">{{env.ValidationMessages.Thisvaluealreadyexists }}</div>
+                              </div>
+                              <div class="col-md-6">
+                                <div class="combo-label">
+                                  <label for="Code"> <span> <em> Code <span class="mandatory"> </span> </em> </span>
+                                  </label>
+                                </div>
+                                <input type="text"  appInputTrim class="form-control" name="Code" [(ngModel)]="Model.Code"
+                                  formControlName="code" 
+                                  [ngClass]="{'is-invalid':(rawMaterialsform.controls.code.errors?.required) && (rawMaterialsform.submitted || rawMaterialsform.controls.code.touched) }"
+                                  placeholder="" (blur)="checkDuplicateCode()" >
+
+                                  <div class="invalid-feedback"
+                                  *ngIf="!isDuplicateCode && (rawMaterialsform.controls.code.errors?.required) && (rawMaterialsform.submitted || rawMaterialsform.controls.code.touched)">
+                                  This field is required.</div>
+                               <div class="invalid-feedback" *ngIf="isDuplicateCode">{{codeExists }}</div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="form-group">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="combo-label">
+                                  <label for="Description"> <span> <em> Description <span class="mandatory"> </span>
+                                      </em> </span> </label>
+                                </div>
+                                <textarea type="text"  appInputTrim class="form-control" name="Description" maxlength="1000"
+                                  [(ngModel)]="Model.Description" formControlName="description"
+                                  [ngClass]="{'is-invalid':(rawMaterialsform.controls.description.errors?.required) && (rawMaterialsform.submitted || rawMaterialsform.controls.description.touched) }"
+                                  placeholder=""></textarea>
+                                <div class="invalid-feedback"
+                                  *ngIf="(rawMaterialsform.controls.description.errors?.required) && (rawMaterialsform.submitted ||rawMaterialsform.controls.description.touched)">
+                                  This field is required.</div>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="submit" class="btn btn-outline-light btn-radius"
+                          (click)="modal.dismiss('Cross click')">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-save btn-radius ripple" *ngIf="(rmmapi.getRolePrivilege('MMR') && rmmapi.getRolePrivilege('MVR'))|| (rmmapi.getRolePrivilege('MMR'))||(rmmapi.getRolePrivilege('MVR') && !rmmapi.getRolePrivilege('MVR'))"
+                          (click)="SaveRawMaterials()">{{buttonName}}
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </ng-container>
+        <ng-template #InActiveModal let-modal>
+          <!-- <div class="modal-header">
+            <h5 class="modal-title" id="modal-basic-title">Raw Material</h5>
+            <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div> -->
+          <div class="modal-body modal-body-sm">
+            <div class="text-center">
+              <div class="avatar-md">
+                <div class="avatar-title">
+                  <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                </div>
+              </div>
+              <div class="row justify-content-center">
+                <h6> Are you sure you want to inactivate the Raw Material?</h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-no btn-radius"
+              (click)="modal.dismiss('Cross click')">No</button>
+            <button type="button" class="btn btn-outline-light btn-radius" (click)="DeleteRawMaterial()">Yes</button>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="tab-pane fade active" [class.show]="moduleName=='Suppliers'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='Suppliers'">
+          <app-suppliers></app-suppliers>
+        </ng-container>
+      </div>
+
+      <div class="tab-pane fade active" [class.show]="moduleName=='Manufacturers'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='Manufacturers'">
+          <app-manufacturers></app-manufacturers>
+        </ng-container>
+
+      </div>
+
+      <div class="tab-pane fade active" [class.show]="moduleName=='DocumentTypes'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='DocumentTypes'">
+          <app-document-types></app-document-types>
+        </ng-container>
+
+      </div>
+
+      <div class="tab-pane fade" id="nav-tab4" role="tabpanel" aria-labelledby="nav-profile-tab">
+        <div class="view-panel">
+          <div class="row">
+            <div class="col">
+              <div class="card">
+                <div class="card-body">
+                  <div class="d-flex flex-row-reverse bd-highlight">
+                    <div class="bd-highlight"><button type="button" class="btn btn-primary btn-radius ripple"
+                        data-toggle="modal" data-target="#myModal4"> <i class="fa fa-plus"> </i> Market
+                        Countries
+                      </button></div>
+                  </div>
+                  Grid start here...
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>

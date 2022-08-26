@@ -1,0 +1,456 @@
+<div class="row">
+  <div class="col">
+    <div class="content-grid">
+      <div class="card">
+        <div class="card-body">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modal-basic-title" >View Comments - Formulation Reference No.
+              {{formulationReferenceNo}} , &nbsp; Version No. {{versionNo}}</h5>
+            <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+
+          <div class="modal-body">
+            <div class="d-flex bd-highlight page_title_section">
+              <div class="bd-highlight flex-left">
+                <span> </span>
+              </div>
+              <div class="flex-grow-1 bd-highlight flex-left">
+                <span> </span>
+              </div>
+              <div class="bd-highlight" >
+                <button id="modal-basic-title"  (click)="AddComment(AddCommentModel)" type="button" 
+                  class="btn btn-primary btn-radius ripple">
+                  <i class="fa fa-plus"></i> Comment
+                </button>
+              </div>
+
+            </div>
+            <!-- <div class="col" style="text-align: right;">
+              <h5 class="modal-title" id="modal-basic-title" (click)="AddComment(AddCommentModel)">Add Comment</h5>
+            </div> -->
+
+          <ng-template #templatecomment let-anchor>
+              <span>{{ anchor.nativeElement.innerText }}</span>
+            </ng-template>
+         <div kendoTooltip showOn="none" [tooltipTemplate]="templatecomment" filter=".k-grid td" (mouseover)="showTooltip($event)">
+            <kendo-grid class="k-grid-custom" [data]="formulationReviewCommentsList" [pageable]="{
+                  buttonCount: this.searchFilter.buttonCount,
+                  info: true,
+                  type: type,
+                  pageSizes: true,
+                  previousNext: true,
+                  position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+              [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+              (pageChange)="pageChange($event)">
+              <kendo-grid-column field="RawMaterialName" title="RawMaterial Name" width="150"> </kendo-grid-column>
+              <kendo-grid-column field="SupplierName" title="Supplier" width="150"></kendo-grid-column>
+              <kendo-grid-column field="TradeName" title="Trade Name" width="120"></kendo-grid-column>
+              <kendo-grid-column field="SubComponentName" title="Sub Component" width="150"></kendo-grid-column>
+              <kendo-grid-column field="CommentCreatedBy" title="Reviewed By/Date" width="150">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                  {{dataItem.CommentCreatedBy}}/{{dataItem.CommentCreatedDate | date: 'dd/MMM/yyyy'}}
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-column field="Comment" title="Review Comments" width="150"></kendo-grid-column>
+              <kendo-grid-column field="StatusName" title="Status" width="100"></kendo-grid-column>
+              <kendo-grid-column title="Actions" width="110">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                  <div class="k-grid-action-list">
+                    <button aria-label="Reply" data-balloon-pos="left" class="btn btn-sm btn-light" 
+                      (click)="EditReviewComment(ReplyCommentModel,dataItem,1)"><span class="fa-reply"></span></button>
+                    <button  aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light" 
+                      (click)="EditReviewComment(EditCommentModel,dataItem,0)"><span class="fa-edit"></span></button>
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid>
+         </div> 
+            <ng-template #AddCommentModel let-modal>
+              <div class="modal-header">
+                <h5 class="modal-title" id="modal-basic-title">Add Comments - Formulation Reference No.
+                  {{formulationReferenceNo}} , &nbsp; Version No. {{versionNo}}</h5>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <form id="frm_FormulationRawMaterials" [formGroup]="formulationReviewCommentForm">
+                  <!-- Modal body -->
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div style="text-align: right;">
+                          <a class="modal-title" id="modal-basic-title" (click)="ReviewCommentsGrid()">View All Comments
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>  
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em> Raw Material Name and Code </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="RawMaterialId" class="kendo_custom_dropdown" [data]="rawMaterialList"
+                          textField="Name" valueField="Id" [defaultItem]="defaultItem"
+                          [(ngModel)]="formulationRawMaterialsModel.RawMaterialId" formControlName="RawMaterialId"
+                          (valueChange)="OnRawMaterialChange($event)">
+                        </kendo-dropdownlist>
+
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="ManufacturerId" class="kendo_custom_dropdown"
+                          [data]="manufacturerList" textField="Name" valueField="Id" [defaultItem]="defaultItem"
+                          [(ngModel)]="formulationRawMaterialsModel.ManufacturerId" formControlName="ManufacturerId">
+                        </kendo-dropdownlist>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em> Suppliers
+                              </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="Suppliers" class="kendo_custom_dropdown" [data]="supplierList"
+                          textField="Name" valueField="Id" [defaultItem]="defaultItem" [valuePrimitive]="true"
+                          [(ngModel)]="formulationRawMaterialsModel.SupplierId" formControlName="SupplierId">
+                        </kendo-dropdownlist>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Trade Name </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="TradeName" class="kendo_custom_dropdown" [data]="tradeNameList"
+                          [defaultItem]="defaultItem" textField="Name" valueField="Id"
+                          [(ngModel)]="formulationRawMaterialsModel.TradeName" formControlName="TradeName">
+                        </kendo-dropdownlist>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Sub-Component </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="SubComponentId" class="kendo_custom_dropdown"
+                          [data]="subComponentList" textField="Name" valueField="Id" [defaultItem]="defaultItem"
+                          [(ngModel)]="formulationRawMaterialsModel.SubComponentId" formControlName="SubComponentId">
+                        </kendo-dropdownlist>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Market </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="Market" class="kendo_custom_dropdown" [data]="marketList"
+                          [defaultItem]="defaultItem" textField="Name" valueField="Id"
+                          [(ngModel)]="formulationRawMaterialsModel.MarketId" formControlName="MarketId">
+                        </kendo-dropdownlist>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="combo-label">
+                          <label data-balloon-pos="up" for="HealthAuthority"> <span> <em> Comment</em></span></label>
+                        </div>
+                        <textarea appInputTrim [readonly]= '!AccessToERC' class="form-control" name="Comment" [(ngModel)]="formulationRawMaterialsModel.Comment"
+                          formControlName="Comment" required></textarea>
+                        <div
+                          *ngIf="formulationReviewCommentForm.controls.Comment.errors?.required && formulationReviewCommentForm.controls.Comment.touched"
+                          class="invalid-feedback">
+                          This field is required.</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Assign User </em></span></label>
+                        </div>
+                        <kendo-dropdownlist name="CommentAssignedTo" class="kendo_custom_dropdown"
+                          [data]="assignUserList" textField="Name" valueField="Id" [defaultItem]="defaultItem"
+                          formControlName="CommentAssignedTo"
+                          [(ngModel)]="formulationRawMaterialsModel.CommentAssignedTo">
+                        </kendo-dropdownlist>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Due Date </em></span></label>
+                        </div>
+                        <kendo-datepicker name="EffectiveDate" #EffectiveDate class="" format="dd/MMM/yyyy"
+                          formControlName="CommentDueDate" [(ngModel)]="formulationRawMaterialsModel.CommentDueDate">
+                        </kendo-datepicker>
+                      </div>
+                    </div>
+                  </div>
+                 
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light btn-radius"
+                  (click)="ReviewCommentsGrid()">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-save btn-radius  ripple"
+                  (click)="SaveReviewComment()">Save</button>
+
+              </div>
+            </ng-template>
+
+            <ng-template #EditCommentModel let-modal>
+              <div class="modal-header">
+                <h5 class="modal-title" id="modal-basic-title">Edit Comments - Formulation Reference No.
+                  {{formulationReferenceNo}} , &nbsp; Version No. {{versionNo}}</h5>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group view-form-group">
+                  <div class="view-item">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em> Raw Material Name and Code </em></span></label>
+                          <span> {{formulationRawMaterialsModel.RawMaterialName}}</span>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+                          <span> {{formulationRawMaterialsModel.ManufacturerName}} </span>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em> Suppliers </em></span></label>
+                          <span> {{formulationRawMaterialsModel.SupplierName}} </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group view-form-group">
+                  <div class="view-item">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Trade Name</em></span></label>
+                          <span> {{formulationRawMaterialsModel.TradeName}} </span>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Sub-Component </em></span></label>
+                          <span> {{formulationRawMaterialsModel.SubComponentName}} </span>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Market</em></span></label>
+                          <span>{{formulationRawMaterialsModel.MarketName}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="combo-label">
+                        <label data-balloon-pos="up" for="HealthAuthority"> <span> <em> Comment</em></span></label>
+                      </div>
+                      <textarea appInputTrim class="form-control" name="Comment" [(ngModel)]="formulationRawMaterialsModel.Comment"
+                        required [disabled]="IsClosed"></textarea>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" name="Close Comment"
+                      [(ngModel)]="formulationRawMaterialsModel.IsClosed" [disabled]="IsClosed">
+                    <label class="form-check-label" for="inlineRadio1">Close Comment </label>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+
+                  <!-- <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <input type="checkbox" [(ngModel)]="formulationRawMaterialsModel.IsClosed" title="Close Comment" [disabled]="IsClosed"
+                        name="Close Comment" /><span class="mr-2">Close Comment</span>
+                    </div>
+                  </div>
+                </div> -->
+                  <div class="form-group view-form-group">
+                    <div class="view-item">
+                    <div class="row">
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Assign User</em></span></label>
+                          <span> {{formulationRawMaterialsModel.CommentAssignedTo}} </span>
+                        </div>
+                      </div>
+                      <div class="col-md-4">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Due Date </em></span></label>
+                          <span> {{formulationRawMaterialsModel.CommentDueDate | date:'dd/MMM/yyyy'}} </span>
+                        </div>
+                      </div>
+
+                      
+                    </div>
+                    </div>
+                  </div>
+                  <div class="form-group view-form-group">
+                    <div class="view-item"> 
+                    <div class="row">
+                      <div class="col-md-12">
+                        <div class="combo-label">
+                          <label for="HealthAuthority"><span><em>Comment Reply </em></span></label>
+                          <span> {{formulationRawMaterialsModel.CommentsReplied}} </span>
+                        </div>
+                      </div>
+                    </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-outline-light btn-radius"
+                    (click)="ReviewCommentsGrid()">Cancel</button>
+                  <button type="submit" class="btn btn-primary btn-save btn-radius  ripple"
+                    (click)="SaveReviewComment()" [disabled]="IsClosed">Save</button>
+                </div>
+            </ng-template>
+
+            <ng-template #ReplyCommentModel let-modal>
+              <div class="modal-header">
+                <h5 class="modal-title" id="modal-basic-title">Reply Comments - Formulation Reference No.
+                  {{formulationReferenceNo}} , &nbsp;  Version No. {{versionNo}}</h5>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <div class="form-group view-form-group">
+                  <div class="view-item"> 
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em> Raw Material Name and Code </em></span></label>
+                        <span>{{formulationRawMaterialsModel.RawMaterialName}}</span>
+                      </div>
+
+                    </div>
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em> Manufacturer </em></span></label>
+                        <span> {{formulationRawMaterialsModel.ManufacturerName}} </span>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em> Suppliers </em></span></label>
+                        <span> {{formulationRawMaterialsModel.SupplierName}} </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+
+                <div class="form-group view-form-group">
+                  <div class="view-item"> 
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Trade Name</em></span></label>
+                        <span> {{formulationRawMaterialsModel.TradeName}} </span>
+                      </div>
+                      
+                    </div>
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Sub-Component </em></span></label>
+                        <span> {{formulationRawMaterialsModel.SubComponentName}} </span>
+                      </div>
+                      
+                    </div>
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Market</em></span></label>
+                        <span> {{formulationRawMaterialsModel.MarketName}} </span>
+                      </div>
+                      
+                    </div>
+                  </div>
+                  </div>
+                </div>
+
+                <div class="form-group view-form-group">
+                  <div class="view-item"> 
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="combo-label">
+                        <label data-balloon-pos="up" for="HealthAuthority"> <span> <em> Comment</em></span></label>
+                        <span> {{formulationRawMaterialsModel.Comment}} </span>
+                      </div>
+                      
+
+                    </div>
+                  </div>
+                </div>
+                </div>
+                <div class="form-group view-form-group">
+                  <div class="view-item"> 
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Assign User</em></span></label>
+                        <span> {{formulationRawMaterialsModel.CommentAssignedTo}} </span>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Due Date </em></span></label>
+                        <span> {{formulationRawMaterialsModel.CommentDueDate | date:'dd/MMM/yyyy'}} </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                </div>
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Comment Reply </em></span></label>
+                      </div>
+                      <textarea appInputTrim class="form-control" name="Comment"
+                        [(ngModel)]="formulationRawMaterialsModel.CommentsReplied" required
+                        [disabled]="IsClosed"></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-outline-light btn-radius"
+                  (click)="ReviewCommentsGrid()">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-save btn-radius  ripple" (click)="SaveReviewComment()"
+                  [disabled]="IsClosed">Save</button>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

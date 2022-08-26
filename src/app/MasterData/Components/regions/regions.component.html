@@ -1,0 +1,129 @@
+<div class="row">
+    <div class="col">
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                        <div class="bd-highlight flex-left">
+                            <span> <em> Regions </em></span>
+                        </div>
+                        <div class="flex-grow-1 bd-highlight flex-left">
+                            <span> </span>
+                        </div>
+                        <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('AR')">
+                            <button type="button" (click)="AddRegionsModal(Regions)"
+                                class="btn btn-primary btn-radius ripple"> <i class="fa fa-plus"></i> Region
+                            </button>
+                        </div>
+                    </div>
+                    <ng-template #template let-anchor>
+                        <span>{{ anchor.nativeElement.innerText }}</span>
+                    </ng-template>
+                    <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+                    <kendo-grid class="k-grid-custom" [data]="regionsList" *ngIf="rmmapi.getRolePrivilege('RL')"
+                    [pageable]="{
+                        buttonCount: this.searchFilter.buttonCount,
+                        info: true,
+                        type: type,
+                        pageSizes: true,
+                        previousNext: true,
+                        position: position }" 
+                      [pageSize]="this.searchFilter.pageSize" 
+                      [skip]="this.searchFilter.pageSkip"
+                      [sortable]="{ allowUnsort: false, mode: 'single'}"
+                      [sort]="sort"
+                      (sortChange)="sortChange($event)"
+                      (pageChange)="pageChange($event)"
+                    >
+                       
+                        <kendo-grid-column field="Name" title="Region" width=""> </kendo-grid-column>
+                        <!-- <kendo-grid-column field="CreatedBy" title="Created By" width="150"></kendo-grid-column> -->
+                        <kendo-grid-column title="Actions" width="90">
+                            <ng-template kendoGridCellTemplate let-dataItem>
+                                <div class="k-grid-action-list">
+                                    <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light " *ngIf="rmmapi.getRolePrivilege('MR')|| rmmapi.getRolePrivilege('VR')"
+                                        (click)="EditRegionsInfo(Regions,dataItem)">
+                                        <span class="fa-edit"></span></button>
+                                    <button aria-label="Inactivate" data-balloon-pos="left" *ngIf="rmmapi.getRolePrivilege('IR')"
+                                        class="btn btn-sm btn-light btn-light-danger "
+                                        (click)="InActiveModalInfo(InActiveModal, dataItem)">
+                                        <span class="fa-ban"></span></button>
+                                </div>
+                            </ng-template>
+                        </kendo-grid-column>
+                    </kendo-grid>
+                    </div>
+
+                    <ng-template #Regions let-modal>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Region' :"Edit Region"
+                                }}</h5>
+                            <button type="button" class="close" aria-label="Close"
+                                (click)="modal.dismiss('Cross click')">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div>
+                            <form id="frm_Regions" name="form" [formGroup]="Regionform"
+                            >
+                                <div class="modal-body">
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="combo-label">
+                                                    <label for="RegionName"><span> <em> Region Name <span
+                                                                    class="mandatory"> </span></em></span></label>
+                                                </div>
+                                                <input type="text"  appInputTrim maxlength="100" class="form-control" formControlName="RegionName"
+                                                    [(ngModel)]="Model.Name" placeholder="" 
+                                                    [ngClass]="{'is-invalid': (Regionform.controls.RegionName.errors?.required) && (submitted || Regionform.controls.RegionName.touched)}"
+                                                    required (blur)="checkDuplicate()">
+
+                                                <div class="invalid-feedback"
+                                                    *ngIf="!isDuplicateRegion && (submitted || Regionform.controls.RegionName.touched) && (Regionform.controls.RegionName.errors?.required)">
+                                                    This field is required.</div>
+                                                    
+                                                <div class="invalid-feedback" *ngIf="isDuplicateRegion">{{env.ValidationMessages.Thisvaluealreadyexists }}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="modal-footer">
+                                    <button type="button" (click)="modal.dismiss('Cross click')"
+                                        class="btn btn-outline-light btn-radius">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-save btn-radius ripple" (mousedown)="AddRegionsInfo(Regionform.value)" *ngIf="(rmmapi.getRolePrivilege('MR') && rmmapi.getRolePrivilege('VR'))|| (rmmapi.getRolePrivilege('MR'))||(rmmapi.getRolePrivilege('VR') && !rmmapi.getRolePrivilege('VR'))">{{
+                                        actionType ? 'Save' :"Update" }}</button>
+                                </div>
+                            </form>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<ng-template #InActiveModal let-modal>
+
+    <div class="modal-body modal-body-sm">
+        <div class="text-center">
+            <div class="avatar-md">
+                <div class="avatar-title">
+                    <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                </div>
+            </div>
+            <div class="row justify-content-center">
+                <h6> Are you sure you want to inactivate the Region?</h6>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-footer">
+        <button type="button" class="btn btn-primary btn-no btn-radius"
+            (click)="modal.dismiss('Cross click')">No</button>
+        <button type="button" class="btn btn-outline-light btn-radius"
+            (click)="DeleteRegionsInfo(dataItem)">Yes</button>
+    </div>
+</ng-template>

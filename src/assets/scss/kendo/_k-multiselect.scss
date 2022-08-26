@@ -1,0 +1,29 @@
+.kendo_custom_multiselect {
+    .k-multiselect {
+        &.k-header {
+            border-color: #b0b0b0;
+            &.k-state-disabled {
+                background-color: #f2f2f2;
+                border-style: solid;
+                border-color: #b0b0b0;
+                .k-multiselect-wrap {
+                    margin: 5px 0 0 5px;
+                    font-size: 13px;
+                    font-weight: 400;
+                    .k-button {
+                        padding: 0.2rem 0.4rem;
+                        border-radius: 0.25rem;
+                    }
+                    .k-input {
+                        background-color: #f2f2f2;
+                        color: #333333;
+                    }
+                }
+                &.k-state-focused {
+                    box-shadow: none;
+                    border-color: #ab78ec;
+                }
+            }
+        }
+    }
+}

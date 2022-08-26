@@ -1,0 +1,92 @@
+<div class="content-grid">
+  <div class="data-checklist-component-grid-vh">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex bd-highlight page_title_section">
+          <div class="bd-highlight flex-left">
+            <span> <em> Checklist Compliance </em> </span>
+          </div>
+          <div class="flex-grow-1 bd-highlight flex-left">
+            <span> </span>
+          </div>
+          <div class="bd-highlight">
+            <button type="button" class="btn btn-outline-primary btn-radius" (click)="Refresh()"> <i
+                class="fa fa-refresh" aria-hidden="true"></i> Refresh </button>
+            <button type="button" class="btn btn-outline-primary btn-radius" (click)="GotoFormulationTranscript()">
+              <i class="fa fa-long-arrow-right"> </i> Next </button>
+          </div>
+        </div>
+
+
+        <ng-template #template let-anchor>
+          <span>{{ anchor.nativeElement.innerText }}</span>
+        </ng-template>
+        <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+          (mouseover)="showTooltip($event, tooltipCC)" #tooltipCC="kendoTooltip">
+          <div class="tab-content" id="v-pills-tabContent">
+            <kendo-grid class="k-grid-custom" [data]="checklistComplianceList" [navigable]="true">
+              <kendo-grid-column field="RawMaterialName" title="Raw Material Name and Code"> </kendo-grid-column>
+              <kendo-grid-column field="SupplierName" title="Supplier"> </kendo-grid-column>
+              <kendo-grid-column field="ManufacturerName" title="Manufacturer"> </kendo-grid-column>
+              <kendo-grid-column field="ComplianceGroup" title="Compliance Group"> </kendo-grid-column>
+              <kendo-grid-column field="PropertyName" title="Property Name"> </kendo-grid-column>
+              <kendo-grid-column field="PropertyValue" title="Property Value"> </kendo-grid-column>
+              <kendo-grid-column field="DocumentType" title="Document Type(s)"> </kendo-grid-column>
+              <kendo-grid-column field="Market" title="Markets"> </kendo-grid-column>
+              <kendo-grid-column field="Mandatory" title="Mandatory?" width="100"> </kendo-grid-column>
+              <kendo-grid-column field="StatusName" title="Status"> </kendo-grid-column>
+            </kendo-grid>
+          </div>
+        </div>
+
+
+
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<br>
+<div class="content-grid pb-3">
+  <div class="data-checklist-component-grid-vh">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex bd-highlight page_title_section">
+          <div class="bd-highlight flex-left">
+            <span> <em> Document Compliance </em> </span>
+          </div>
+        </div>
+        <ng-template #templateDoc let-anchor>
+          <span>{{ anchor.nativeElement.innerText }}</span>
+        </ng-template>
+        <div kendoTooltip showOn="none" [tooltipTemplate]="templateDoc" filter=".k-grid td"
+          (mouseover)="showTooltip($event, tooltipDC)" #tooltipDC="kendoTooltip">
+          <div class="tab-content" id="v-pills-tabContent">
+            <kendo-grid kendoTooltip class="k-grid-custom" [data]="documentComplianceList" [navigable]="true">
+              <kendo-grid-column field="RawMaterialName" title="Raw Material Name and Code"> </kendo-grid-column>
+              <kendo-grid-column field="SupplierName" title="Supplier"> </kendo-grid-column>
+              <kendo-grid-column field="ManufacturerName" title="Manufacturer"> </kendo-grid-column>
+              <kendo-grid-column field="Mandatory" title="Mandatory?"> </kendo-grid-column>
+              <kendo-grid-column field="Market" title="Markets"> </kendo-grid-column>
+              <kendo-grid-column field="DocumentType" title="Document Type"> </kendo-grid-column>
+              <kendo-grid-column field="DocumentDate" title="Document Effective Date">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                  {{dataItem.DocumentDate | date: 'MM/dd/yyyy'}}
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-column field="Validity" title="Validity">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                  <div *ngIf="dataItem.Validity === '11'">No Expiry</div>
+                  <div *ngIf="dataItem.Validity !== '11'  && dataItem.Validity !== '0'">{{dataItem.Validity }}
+                  </div>
+                </ng-template>
+              </kendo-grid-column>
+              <kendo-grid-column field="StatusName" title="Status"> </kendo-grid-column>
+            </kendo-grid>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

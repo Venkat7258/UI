@@ -1,0 +1,144 @@
+
+  <div class="row">
+    <div class="col">
+      <div class="content-grid"> 
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="bd-highlight flex-left">
+              <span> <em> Suppliers </em> </span>
+            </div>
+            <div class="flex-grow-1 bd-highlight flex-left">
+              <span> </span>
+            </div>
+            <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('AS')">
+              <button (click)="OpenSuppliersPopUp(Suppliers)" type="button" data-toggle="modal" data-target="#myModal"
+              class="btn btn-primary btn-radius ripple"> <i class="fa fa-plus"></i> Supplier
+            </button>
+            </div>
+          </div>
+          <ng-template #template let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+        </ng-template>
+        <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+          <kendo-grid class="k-grid-custom" [data]="suppliersList" *ngIf="rmmapi.getRolePrivilege('SL')"
+          [pageable]="{
+            buttonCount: this.searchFilter.buttonCount,
+            info: true,
+            type: type,
+            pageSizes: true,
+            previousNext: true,
+            position: position }"  
+          [pageSize]="this.searchFilter.pageSize" 
+          [skip]="this.searchFilter.pageSkip"
+          [sortable]="{ allowUnsort: false, mode: 'single'}"
+          [sort]="sort"
+          (sortChange)="sortChange($event)"
+          (pageChange)="pageChange($event)">
+            <kendo-grid-column field="Name" title="Supplier Name" width=""> </kendo-grid-column>
+            <kendo-grid-column field="LocationName" title="Location" width=""></kendo-grid-column>
+            <kendo-grid-column field="Address" title="Address" width=""></kendo-grid-column>
+            <kendo-grid-column title="Actions" width="90">
+              <ng-template kendoGridCellTemplate let-dataItem>
+                <div class="k-grid-action-list"> 
+                <button aria-label="View/ Edit" data-balloon-pos="left"  class="btn btn-sm btn-light" (click)="EditSuppliers(Suppliers,dataItem)"><span  class="fa-edit" *ngIf="rmmapi.getRolePrivilege('MS') || rmmapi.getRolePrivilege('VS')"></span></button>
+                <button aria-label="Inactivate" data-balloon-pos="left" class="btn btn-sm btn-light btn-light-danger" (click)="InActiveModalInfo(InActiveModal, dataItem)" *ngIf="rmmapi.getRolePrivilege('IS')"><span class="fa-ban"></span></button>
+              </div>
+              </ng-template>
+            </kendo-grid-column>
+          </kendo-grid>
+          </div>
+          <ng-template #Suppliers let-modal>
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-basic-title">{{formTitle}}</h5>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form id="frm_Markets" name="form" [formGroup]="suppliersform">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="combo-label">
+                        <label for="SupplierName"> <span> <em> Supplier Name <span class="mandatory"> </span> </em> </span> </label>
+                      </div>
+                       
+                      <input type="text"  appInputTrim maxlength="100" class="form-control" name="SuppliersName"
+                      [(ngModel)]="Model.Name" placeholder=""
+                      formControlName="name" (blur)="checkDuplicate()"
+                      [ngClass]="{'is-invalid': (suppliersform.controls.name.errors?.required) && (suppliersform.controls.name.touched || suppliersform.submitted) }"
+                      placeholder=""  >
+
+
+                      <div class="invalid-feedback"
+                        *ngIf="!isDuplicateSupplier && (suppliersform.controls.name.errors?.required) && (suppliersform.controls.name.touched || suppliersform.submitted)">
+                        This field is required.</div>
+                      <div *ngIf="isDuplicateSupplier" class="invalid-feedback">{{this.env.ValidationMessages.Thisvaluealreadyexists}}</div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="combo-label"> 
+                      <label for="Location"> <span> <em> Location <span class="mandatory"> </span> </em> </span> </label>
+                    </div>
+                      <kendo-dropdownlist name="Region" class="kendo_custom_dropdown" [data]="allCountries" textField="Name" valueField="Id"
+                        formControlName="locationId" [valuePrimitive]="true" [(ngModel)]="Model.LocationId"
+                       
+                        [defaultItem]="defaultItem">
+                      </kendo-dropdownlist>
+                      <div class="invalid-feedback"
+                        *ngIf="(suppliersform.controls.locationId.errors?.required) && (suppliersform.controls.locationId.touched || suppliersform.submitted) ">
+                        This field is required.</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <div class="combo-label"> 
+                      <label for="Address"> <span> <em> Address </em> </span> </label>
+                      </div>
+                      <textarea type="text"  appInputTrim maxlength="1000" class="form-control" name="Address" 
+                        formControlName="address" placeholder="" [formControl]="address" [(ngModel)]="Model.Address" ></textarea>
+                    </div>
+                  </div>
+                </div>
+                
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-outline-light btn-radius" (click)="modal.dismiss('Cross click')">Cancel</button>
+              <button type="submit" class="btn btn-primary btn-save btn-radius ripple" *ngIf="(rmmapi.getRolePrivilege('MS') && rmmapi.getRolePrivilege('VS'))|| (rmmapi.getRolePrivilege('MS'))||(rmmapi.getRolePrivilege('VS') && !rmmapi.getRolePrivilege('VS'))" 
+              (click)="SaveSuppliers()">{{buttonName}}</button>
+            </div>
+          </ng-template>
+          <ng-template #InActiveModal let-modal>
+            <!-- <div class="modal-header">
+              <h6 class="modal-title" id="modal-basic-title">Suppliers</h6>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div> -->
+            <div class="modal-body modal-body-sm">
+              <div class="text-center">
+                <div class="avatar-md">
+                  <div class="avatar-title">
+                    <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                  </div>
+                  </div>
+                  <div class="row justify-content-center">
+                    <h6> Are you sure you want to inactivate the Supplier?</h6>
+                  </div>
+              </div>
+            </div>
+              
+              <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-no btn-radius" (click)="modal.dismiss('Cross click')">No</button>
+                <button type="button" class="btn btn-outline-light btn-radius" (click)="DeleteSuppliers()">Yes</button>
+              </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+    </div>
+  </div>

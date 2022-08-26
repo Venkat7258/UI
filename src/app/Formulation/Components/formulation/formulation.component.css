@@ -1,0 +1,9 @@
+.disableElements{
+     pointer-events: none;
+    }
+
+
+.CancelEditBtn {
+     display: flex;
+    flex-direction: row-reverse;
+}

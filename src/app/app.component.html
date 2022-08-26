@@ -1,0 +1,147 @@
+<div class="main-content">
+  <div class="sidebar" [hidden]="!showHeader">
+    <div class="sidebar-header">
+      <!-- <img class="sidebar-logo" src="../../../assets/img/rmReadyy.png"> -->
+      <img src="../../../assets/img/logo-c.png" width="100">
+    </div>
+    <ul class="sidebar-menu">
+      <span> <i class="fa fa-angle-double-right menu-arrow menuSticky"></i> </span>
+      <!-- <li>
+        <a routerLink="/Formulations" [class]="this.currentUrlName === 'Dashboard' ?  'active': ''"
+          (click)="navigateToComponent('Dashboard')" routerLink="Dashboard">
+          <i class="flaticon-pie-chart sidebar-icon"></i>
+          <span class="sidebar-label">Dashboard</span>
+        </a>
+      </li> -->
+      <!-- <li>
+        <a routerLink="/Formulations" [class]="this.currentUrlName === 'Formulations' ?  'active': ''"
+          (click)="navigateToComponent('Formulations')" routerLink="Formulations">
+          <i class="flaticon-cell sidebar-icon"></i>
+          <span class="sidebar-label">Formulations</span>
+        </a>
+      </li> -->
+      <!-- <li>
+        <a routerLink="/Formulations" [class]="this.currentUrlName === 'RawMaterials' ?  'active': ''"
+          (click)="navigateToComponent('RawMaterials')" routerLink="/RawMaterials">
+          <i class="flaticon-test-tube sidebar-icon"></i>
+          <span class="sidebar-label">Raw Materials</span>
+        </a>
+      </li> -->
+     <!-- <li class="sidebar-collapse arrow" *ngIf="rmmapi.getRolePrivilege('PL')">
+        <div class="icon-link">
+          <a routerLinkActive="active"
+            [class]="this.currentUrlName === 'Masterdata/Products' ?  'active': '' || this.currentUrlName === 'Masterdata/Markets' ?  'active': '' || this.currentUrlName === 'Masterdata/RawMaterials' ?  'active': '' || this.currentUrlName === 'Masterdata/Sub-Component' ?  'active': '' || this.currentUrlName === 'Masterdata/Regulations' ?  'active': '' || this.currentUrlName === 'Masterdata/Functions' ?  'active': '' || this.currentUrlName === 'Masterdata/Status' ?  'active': '' ">
+            <i class="flaticon-binder sidebar-icon"></i>
+            <span class="sidebar-label">Master Data</span>
+            <i class="fa fa-angle-right sub-menu-arrow-rotate" aria-hidden="true"></i>
+          </a>
+        </div>
+         <ul class="sub-menu">
+          <li><a routerLinkActive="active" routerLink="/Masterdata/Products"> Products </a></li>
+          <li><a routerLinkActive="active" routerLink="/Masterdata/Markets"> Markets </a></li>
+          <li><a routerLinkActive="active" routerLink="/Masterdata/RawMaterials"> Raw Materials </a></li>
+          <li><a routerLinkActive="active" routerLink="/Masterdata/Sub-Component"> Sub-component </a></li>
+          <li><a routerLinkActive="active" routerLink="/Masterdata/Regulations">Regulations </a></li>
+          <li><a routerLinkActive="active" routerLink="/Masterdata/Functions"> Functions </a></li>
+          <li><a routerLinkActive="active" routerLink="/Masterdata/Status"> Status </a></li>
+
+-->
+          <!-- <li><a (click)="navigateToComponent('Masterdata/Products')" routerLink="Masterdata/Products"> Products </a></li>
+          <li><a (click)="navigateToComponent('Masterdata/Markets')" routerLink="Masterdata/Markets"> Markets </a></li>
+          <li><a (click)="navigateToComponent('Masterdata/RawMaterials')" routerLink="Masterdata/RawMaterials"> Raw Materials </a></li>
+          <li><a (click)="navigateToComponent('Masterdata/Sub-Component')" routerLink="Masterdata/Sub-Component"> Sub Component </a></li>
+          <li><a (click)="navigateToComponent('Masterdata/Regulations')" routerLink="Masterdata/Regulations">Regulations </a></li>
+          <li><a (click)="navigateToComponent('Masterdata/Functions')" routerLink="Masterdata/Functions"> Functions </a></li>
+          <li><a (click)="navigateToComponent('Masterdata/Status')" routerLink="Masterdata/Status"> Status </a></li> -->
+        <!-- </ul> 
+      </li> -->
+      <li class="sidebar-collapse arrow" *ngIf="rmmapi.getRolePrivilege('VU')">
+        <div class="icon-link">
+          <a routerLinkActive="active" [class]="this.currentUrlName === 'Users' ?  'active': ''">
+            <i class="flaticon-settings sidebar-icon"></i>
+            <span class="sidebar-label">Administration</span>
+            <i class="fa fa-angle-right sub-menu-arrow-rotate" aria-hidden="true"></i>
+          </a>
+        </div>
+        <ul class="sub-menu">
+          <li><a [class]="this.currentUrlName === 'Users' ?  'active': ''" (click)="navigateToComponent('Users')"
+              routerLink="Users"> Users & Roles </a>
+          </li>
+          <!-- <li><a href="#!"> Roles </a></li>
+          <li><a href="#!"> Privileges </a></li>
+          <li><a href="#!"> Notifications </a></li> -->
+        </ul>
+      </li>
+    </ul>
+  </div>
+  <section class="page-content-wrapper">
+    <main class="inner-body">
+      <div class="header" [hidden]="!showHeader">
+        <nav class="navbar">
+          <a class="navbar-brand">
+            <span class="title"> {{showHeaderTitle}} </span>
+          </a>
+          <ul class="nav pull-right">
+            <!-- <ul class="menu">
+            <li class="dropdown dropdown-2">
+           <i class="icon-cog"></i>
+             <ul class="dropdown_menu dropdown_menu-2 theming-options">
+                <li class="dropdown_item-1"><div data-theme="light" (click)="setTheme('light')" class="switch" id="switch-1">Default</div> </li>
+                <li class="dropdown_item-2"><div data-theme="green" (click)="setTheme('green')" class="switch" id="switch-2">Green</div> </li> 
+                <li class="dropdown_item-3"><div data-theme="blue" (click)="setTheme('blue')" class="switch" id="switch-3">Blue</div> </li>
+               <li class="dropdown_item-4"><div data-theme="dark" (click)="setTheme('dark')" class="switch" id="switch-4">Dark</div> </li> 
+                 <li class="dropdown_item-5">Item 5</li> 
+             </ul>
+           </li>
+         </ul>  -->
+
+            <!-- <div class="dropdown">
+              <button class="btn bell_icon dark-grey" type="button" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="false">
+                <i class="icon-cog"></i>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right custom-dd">
+                <a data-theme="light" (click)="setTheme('light')" class="switch" id="switch-1"
+                  class="dropdown-item">Default</a>
+                <a data-theme="green" (click)="setTheme('green')" class="switch" id="switch-2" class="dropdown-item">
+                  Green </a>
+                <a data-theme="blue" (click)="setTheme('blue')" class="switch" id="switch-3" class="dropdown-item"> Blue
+                </a>
+                <a data-theme="dark" (click)="setTheme('dark')" class="switch" id="switch-4" class="dropdown-item"> Dark
+                </a>
+              </div>
+            </div> -->
+            <div class="dropdown profil_section">
+              <button class="btn dropdown-toggle dark-grey" type="button" data-toggle="dropdown" aria-haspopup="true"
+                aria-expanded="true">
+                <i class="fa fa-user-o"></i> <span class="user_name"> {{showHeaderUserName}}</span>
+              </button>
+              <div class="dropdown-menu dropdown-menu-right custom-dd">
+                <a class="dropdown-item" href="javascript:Void(0);" (click)="OpenProfile()"> <i
+                    class="fa fa-user-o"></i>
+                  Profile</a>
+                <a class="dropdown-item" href="javascript:Void(0);" (click)="ChangePwd()"> <i class="fa fa-lock"></i>
+                  Change Password</a>
+                <a class="dropdown-item" href="javascript:Void(0);" (click)="Logout()"> <i class="fa fa-sign-out"></i>
+                  Logout</a>
+              </div>
+            </div>
+
+          </ul>
+
+        </nav>
+
+        <!-- <i class="fa fa-bars menu-arrow menuSticky"></i>  -->
+      </div>
+
+      <router-outlet></router-outlet>
+
+    </main>
+  </section>
+
+</div>
+
+<!-- The Modal -->
+
+
+<div *ngIf="loader" class="k-loading-mask k-i-loading"></div>

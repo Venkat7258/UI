@@ -1,0 +1,117 @@
+
+  <div class="row">
+    <div class="col">
+      <div class="content-grid"> 
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="bd-highlight flex-left">
+              <span> <em> Property Value Type Options </em> </span>
+            </div>
+            <div class="flex-grow-1 bd-highlight flex-left">
+              <span> </span>
+            </div>
+            <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('APVTO')">
+              <button type="button" class="btn btn-primary btn-radius ripple"
+                (click)="PropertyValueTypeOptionsModal(PropertyValueTypeOptions)"> <i class="fa fa-plus"> </i> 
+                Property Value Type Option
+              </button>
+            </div>
+          </div>
+          <ng-template #template let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+        </ng-template>
+        <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+          <kendo-grid class="k-grid-custom" [data]="propertyValueTypeOptionsList" *ngIf="rmmapi.getRolePrivilege('PVTOL')"
+          [pageable]="{
+            buttonCount: this.searchFilter.buttonCount,
+              info: true,
+              type: type,
+              pageSizes: true,
+              previousNext: true,
+              position: position }" 
+          [pageSize]="this.searchFilter.pageSize" 
+          [skip]="this.searchFilter.pageSkip"
+          [sortable]="{ allowUnsort: false, mode: 'single'}"
+          [sort]="sort"
+          (sortChange)="sortChange($event)"
+          (pageChange)="pageChange($event)">
+            
+            <kendo-grid-column field="PropertyValueTypeOption" title="Property Value Type Option Name" width="">
+            </kendo-grid-column>
+            <kendo-grid-column title="Actions" width="90">
+              <ng-template kendoGridCellTemplate let-dataItem>
+                <div class="k-grid-action-list"> 
+                <button aria-label="View/ Edit" data-balloon-pos="left"  class="btn btn-sm btn-light"
+                  (click)="EditPropertyValueTypeOptionsInfo(PropertyValueTypeOptions,dataItem)" *ngIf="rmmapi.getRolePrivilege('MPVTO') || rmmapi.getRolePrivilege('VPVTO')"> <span  class="fa-edit"></span></button>
+                <button aria-label="Inactivate" data-balloon-pos="left" class="btn btn-sm btn-light btn-light-danger " (click)="InActiveModalInfo(InActiveModal,dataItem)" *ngIf="rmmapi.getRolePrivilege('IPVTO')">
+                  <span  class="fa-ban"></span>  
+                </button>
+                    </div>
+              </ng-template>
+            </kendo-grid-column>
+          </kendo-grid>
+          </div>
+          <ng-template #PropertyValueTypeOptions let-modal>
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Property Value Type Option' :"Edit Property Value Type Option"  }}</h5>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form name="form" #PropertyValueTypeOptionsform="ngForm"
+              >
+              <div class="modal-body">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="combo-label"> 
+                      <label> <span> <em> Property Value Type Option Name <span class="mandatory"> </span> </em> </span> </label>
+                    </div>
+                      <input type="text"  appInputTrim [disabled]="!rmmapi.getRolePrivilege('MPVTO') || rmmapi.getRolePrivilege('VPVTO')=='false' ? true : null" maxlength="100" class="form-control" name="PropertyValueTypeOptionsName"
+                        [(ngModel)]="propertyValueTypeOptionsModel.PropertyValueTypeOption" placeholder=""
+                        #PropertyValueTypeOptionsName="ngModel"
+                        [ngClass]="{ 'is-invalid': PropertyValueTypeOptionsform.submitted && PropertyValueTypeOptionsName.invalid }"
+                        required (blur)="CheckDuplicatePropertyValueTypeOptionsInfo()">
+                      <div *ngIf="PropertyValueTypeOptionsform.submitted && PropertyValueTypeOptionsName.invalid"
+                        class="invalid-feedback">
+                        <div *ngIf="PropertyValueTypeOptionsName.errors.required">
+                          This field is required.</div>
+                      </div>
+                      <div class="invalid-feedback" *ngIf="isCheckPropertyValueTypeOptions">{{env.ValidationMessages.Thisvaluealreadyexists}}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="modal.dismiss('Cross click')"
+                  class="btn btn-outline-light btn-radius">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-save btn-radius ripple" (mousedown)="PropertyValueTypeOptionsform.form.valid && AddPropertyValueTypeOptionsInfo(PropertyValueTypeOptionsform.value)" *ngIf="(rmmapi.getRolePrivilege('MPVTO') && rmmapi.getRolePrivilege('VPVTO'))|| (rmmapi.getRolePrivilege('MPVTO'))||(rmmapi.getRolePrivilege('VPVTO') && !rmmapi.getRolePrivilege('VPVTO'))">{{ actionType ? 'Save' :"Update" }}</button>
+              </div>
+            </form>
+          </ng-template>
+          <ng-template #InActiveModal let-modal>
+            <div class="modal-body modal-body-sm">
+              <div class="text-center">
+                <div class="avatar-md">
+                  <div class="avatar-title">
+                    <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                  </div>
+                  </div>
+                  <div class="row justify-content-center">
+                    <h6>Are you sure you want to inactivate the Property Value Type Option?</h6>
+                  </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary btn-no btn-radius"
+                (click)="modal.dismiss('Cross click')">No</button>
+              <button type="button" class="btn btn-outline-light btn-radius"
+                (click)="DeletePropertyValueTypeOptionsInfo()">Yes</button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>

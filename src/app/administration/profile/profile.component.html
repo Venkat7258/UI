@@ -1,0 +1,224 @@
+<div class="modal-header">
+    <h5 class="modal-title" id="modal-basic-title">{{"Profile" }}</h5>
+    <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+<form id="frm_RawMaterial" name="form" #Userform="ngForm"
+    (ngSubmit)="Userform.form.valid && AddUserDetails(Userform.value)">
+    <!-- Modal body -->
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-12">
+                <h6 class="m-b-10"> Role Name </h6>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Tenant <span class="mandatory"> </span>
+                                </em> </span>
+                        </label>
+                    </div>
+                    <kendo-dropdownlist [attr.disabled]="true" name="Tenant" class="kendo_custom_dropdown"
+                        [data]="tenantsInfoList" textField="Name" [defaultItem]="DefaultItem" valueField="Id"
+                        [valuePrimitive]="true" [(ngModel)]="userModel.TenantId" #Tenant="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && Tenant.invalid }" required>
+                    </kendo-dropdownlist>
+                    <div *ngIf="Userform.submitted && Tenant.invalid" class="invalid-feedback">
+                        <div *ngIf="Tenant.errors.required"> This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Affiliate <span class="mandatory"> </span> </em></span></label>
+                    </div>
+                    <kendo-dropdownlist [attr.disabled]="true" name="Affiliate" class="kendo_custom_dropdown"
+                        [data]="affiliatesInfoList" textField="Name" [defaultItem]="DefaultItem" valueField="Id"
+                        [valuePrimitive]="true" [(ngModel)]="userModel.AffiliateId" #Affiliate="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && Affiliate.invalid }" required>
+                    </kendo-dropdownlist>
+                    <div *ngIf="Userform.submitted && Affiliate.invalid" class="invalid-feedback">
+                        <div *ngIf="Affiliate.errors.required">This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Role Name <span class="mandatory"> </span> </em></span></label>
+                    </div>
+                    <input type="text"  appInputTrim [attr.disabled]="true" class="form-control" name="sRole"
+                        [(ngModel)]="userModel.RoleName" placeholder="" #sRole="ngModel" maxlength="100"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && sRole.invalid }">
+                    <!-- <kendo-dropdownlist name="sRole" class="kendo_custom_dropdown" [data]="rolesInfoList"
+                                textField="Name" [defaultItem]="DefaultItem" valueField="Id" [valuePrimitive]="true"
+                                [(ngModel)]="userModel.RoleId" #sRole="ngModel"
+                                [ngClass]="{ 'is-invalid': Userform.submitted && sRole.invalid }" required>
+                            </kendo-dropdownlist> -->
+                    <div *ngIf="Userform.submitted && sRole.invalid" class="invalid-feedback">
+                        <div *ngIf="sRole.errors.required">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <h6 class="m-t-20 m-b-10"> User Details </h6>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> First Name <span class="mandatory"> </span> </em>
+                            </span>
+                        </label>
+                    </div>
+                    <input type="text"  appInputTrim [attr.disabled]="true" class="form-control" name="FirstName"
+                        [(ngModel)]="userModel.FirstName" maxlength="100" placeholder="" #FirstName="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && FirstName.invalid }" required>
+                    <div *ngIf="Userform.submitted && FirstName.invalid" class="invalid-feedback">
+                        <div *ngIf="FirstName.errors.required"> This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Middle Name</em></span></label>
+                    </div>
+                    <input type="text"  appInputTrim [attr.disabled]="true" class="form-control" name="MiddleName"
+                        [(ngModel)]="userModel.MiddleName" placeholder="" #MiddleName="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && MiddleName.invalid }">
+                    <div *ngIf="Userform.submitted && MiddleName.invalid" class="invalid-feedback">
+                        <div *ngIf="MiddleName.errors.required">This field is required.</div>
+
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Last Name <span class="mandatory"> </span>
+                                </em> </span> </label>
+                    </div>
+                    <input type="text"  appInputTrim [attr.disabled]="true" class="form-control" name="LastName"
+                        [(ngModel)]="userModel.LastName" maxlength="100" placeholder="" #LastName="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && LastName.invalid }" required>
+                    <div *ngIf="Userform.submitted && LastName.invalid" class="invalid-feedback">
+                        <div *ngIf="LastName.errors.required">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Username <span class="mandatory"> </span>
+                                </em> </span> </label>
+                    </div>
+                    <input type="text"  appInputTrim [attr.disabled]="true" class="form-control" name="UserName"
+                        [(ngModel)]="userModel.UserName" maxlength="50" placeholder="" #UserName="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && UserName.invalid }" required>
+                    <div *ngIf="Userform.submitted && UserName.invalid" class="invalid-feedback">
+                        <div *ngIf="UserName.errors.required">This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Phone Number <span class="mandatory"> </span>
+                                </em> </span>
+                        </label>
+                    </div>
+                    <input type="text"  appInputTrim class="form-control" name="PhoneNumber" [(ngModel)]="userModel.PhoneNumber"
+                        placeholder="" #PhoneNumber="ngModel" maxlength="20"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && PhoneNumber.invalid }" required>
+                    <div *ngIf="Userform.submitted && PhoneNumber.invalid" class="invalid-feedback">
+                        <div *ngIf="PhoneNumber.errors.required"> This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>Email <span class="mandatory"> </span> </em></span></label>
+                    </div>
+                    <input type="text"  appInputTrim class="form-control" [attr.disabled]="true" name="Email"
+                        [(ngModel)]="userModel.Email" placeholder="" #Email="ngModel" maxlength="100"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && Email.invalid }" required>
+                    <div *ngIf="Userform.submitted && Email.invalid" class="invalid-feedback">
+                        <div *ngIf="Email.errors.required">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Address <span class="mandatory"> </span>
+                                </em> </span> </label>
+                    </div>
+                    <input type="text"  appInputTrim class="form-control" name="Address" [(ngModel)]="userModel.Address"
+                        placeholder="" #Address="ngModel" maxlength="500"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && Address.invalid }" required>
+                    <div *ngIf="Userform.submitted && Address.invalid" class="invalid-feedback">
+                        <div *ngIf="Address.errors.required">This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> City 
+                                </em> </span>
+                        </label>
+                    </div>
+                    <!-- <kendo-dropdownlist name="City" class="kendo_custom_dropdown" [data]="cityInfoList"
+                        textField="Name" [defaultItem]="DefaultItem" valueField="Id" [valuePrimitive]="true"
+                        [(ngModel)]="userModel.CityId" #City="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && City.invalid }" required>
+                    </kendo-dropdownlist> -->
+                    <input type="text"  appInputTrim class="form-control" name="City" [(ngModel)]="userModel.CityId" placeholder=""
+                        #City="ngModel" maxlength="100"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && City.invalid }">
+                    <div *ngIf="Userform.submitted && City.invalid" class="invalid-feedback">
+                        <div *ngIf="City.errors.required"> This field is required.</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"><span><em>State</em></span></label>
+                    </div>
+                    <!-- <kendo-dropdownlist name="State" class="kendo_custom_dropdown" [data]="statesInfoList"
+                        textField="Name" [defaultItem]="DefaultItem" valueField="Id" [valuePrimitive]="true"
+                        [(ngModel)]="userModel.StateId" #State="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && State.invalid }" required>
+                    </kendo-dropdownlist> -->
+                    <input type="text"  appInputTrim class="form-control" name="State" [(ngModel)]="userModel.StateId" placeholder=""
+                        #State="ngModel" maxlength="100"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && State.invalid }">
+                    <div *ngIf="Userform.submitted && State.invalid" class="invalid-feedback">
+                        <div *ngIf="State.errors.required">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Country
+                                </em> </span> </label>
+                    </div>
+                    <kendo-dropdownlist name="Country" class="kendo_custom_dropdown" [data]="countriesInfoList"
+                        textField="Name" [defaultItem]="DefaultItem" valueField="Id" [valuePrimitive]="true"
+                        [(ngModel)]="userModel.CountryId" #Country="ngModel"
+                        [ngClass]="{ 'is-invalid': Userform.submitted && Country.invalid }">
+                    </kendo-dropdownlist>
+                    <div *ngIf="Userform.submitted && Country.invalid" class="invalid-feedback">
+                        <div *ngIf="Country.errors.required">This field is required.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button type="button" (click)="activeModal.dismiss('Cross click')"
+            class="btn btn-outline-light btn-radius">Cancel</button>
+        <button type="submit" class="btn btn-primary btn-save btn-radius">{{ "Update" }}</button>
+    </div>
+</form>

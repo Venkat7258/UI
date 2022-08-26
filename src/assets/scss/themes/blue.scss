@@ -1,0 +1,18 @@
+$primary :#0084d1;
+$sidebarcolor : #e7f9ff;
+$hover-color:#b8e7f7;
+$codecolor:#0084d1 ;
+$blue-value-map:(
+    name:"blue",
+    text-color:$gray-800,
+    background-color:$white,
+    active-color:$primary,
+    button-color:$primary,
+    sidebar-color:$sidebarcolor,
+    hover-color:$hover-color,
+    code-color:$codecolor,
+    button-text-color:$white,
+    button-bg-disable: $gray-200,
+    button-border-disable: $gray-400,
+    button-text-color-disable:$gray-700,
+)

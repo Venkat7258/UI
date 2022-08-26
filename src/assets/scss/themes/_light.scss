@@ -1,0 +1,20 @@
+$primary :#ed1a60;
+$sidebarcolor :#fff2f2;
+$hover-color:#EBF0FF;
+$codecolor:#f70020;
+$light-value-map:(
+    name:"light",
+    text-color:$gray-800,
+    background-color:$white,
+    active-color:$primary,
+    button-color:$primary,
+    sidebar-color:$sidebarcolor,
+    hover-color:$hover-color,
+    code-color:$codecolor,
+    button-text-color:$white,
+    button-text-color-secondary:$gray-900,
+    button-bg-disable: $gray-200,
+    button-border-disable: $gray-400,
+    button-text-color-disable:$gray-700,
+
+)

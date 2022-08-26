@@ -1,0 +1,27 @@
+.page-content-wrapper {
+    position: relative;
+    height: calc(100vh - 0px);
+    left: 60px;
+    width: calc(100% - 60px);
+    // background: #eee;
+
+  }
+  .page-content-wrapper .header {
+    height: 50px;
+    align-items: center;
+    background: $white;
+    z-index: 9;
+    border-bottom: solid 1px #eee;
+    // box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.03);
+  
+  }
+  
+  .txt-padding {
+    font-size: 1rem;
+    font-weight: $headings-font-weight;
+    color: $darkblue;
+    float: left;
+    i {
+      margin: 0.8rem 0.5rem 0.8rem 0rem;
+    }
+  }

@@ -1,0 +1,197 @@
+<div class="row">
+  <div class="col">
+    <div class="content-grid">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="bd-highlight flex-left">
+              <span> <em> Property Value Types </em></span>
+            </div>
+            <div class="flex-grow-1 bd-highlight flex-left">
+              <span> </span>
+            </div>
+            <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('APVT')">
+              <button type="button" class="btn btn-primary btn-radius ripple"
+                (click)="PropertyValueTypesModal(PropertyValueTypes)"> <i class="fa fa-plus"> </i>
+                Property Value Type
+              </button>
+            </div>
+          </div>
+          <ng-template #template let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+          </ng-template>
+          <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+            (mouseover)="showTooltip($event)">
+            <kendo-grid class="k-grid-custom" [data]="propertyValueTypesList" *ngIf="rmmapi.getRolePrivilege('PVTL')"
+              [pageable]="{
+            buttonCount: this.searchFilter.buttonCount,
+              info: true,
+              type: type,
+              pageSizes: true,
+              previousNext: true,
+              position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+              [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+              (pageChange)="pageChange($event)">
+              <kendo-grid-column field="PropertyValueTypeOptionName" title="Property Value Type Option Name" width="">
+              </kendo-grid-column>
+              <kendo-grid-column field="ChecklistRegulationPropertiesName" title="Regulation Property Name" width="">
+              </kendo-grid-column>
+              <kendo-grid-column field="ChecklistRegulationGroupName" title="Regulation Group Name" width="">
+              </kendo-grid-column>
+              <kendo-grid-column field="StatusName" title="Compliance Status" width="">
+                <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex">
+                  <div class="k-grid-status-list">
+                    <div [class]="dataItem.StatusName | TransformationStatuCodeColor : 'propertyValueTypes'  ">
+                      {{dataItem.StatusName }}  
+                      
+                    </div>
+                  </div>
+                </ng-template>
+
+              </kendo-grid-column>
+              <kendo-grid-column title="Actions" width="90">
+                <ng-template kendoGridCellTemplate let-dataItem>
+                  <div class="k-grid-action-list">
+                    <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light "
+                      (click)="EditPropertyValueTypesInfo(PropertyValueTypes,dataItem)"
+                      *ngIf="rmmapi.getRolePrivilege('MPVT') || rmmapi.getRolePrivilege('VPVT')"><span
+                        class="fa-edit"></span></button>
+                    <button aria-label="Inactivate" data-balloon-pos="left"
+                      class="btn btn-sm btn-light btn-light-danger " (click)="InActiveModalInfo(InActiveModal,dataItem)"
+                      *ngIf="rmmapi.getRolePrivilege('IPVT')"><span class="fa-ban"></span></button>
+                  </div>
+
+                </ng-template>
+              </kendo-grid-column>
+            </kendo-grid>
+          </div>
+          <ng-template #PropertyValueTypes let-modal>
+            <div class="modal-header">
+              <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Property Value Type' :"Edit Property Value Type" }}
+              </h5>
+              <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form id="frm_PropertyValueTypes" name="form" #PropertyValueTypesform="ngForm"
+              (ngSubmit)="PropertyValueTypesform.form.valid && AddPropertyValueTypesInfo(PropertyValueTypesform.value)">
+              <div class="modal-body">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Regulation Group <span class="mandatory"> </span>
+                            </em> </span> </label>
+                      </div>
+                      <kendo-dropdownlist
+                        [disabled]="!rmmapi.getRolePrivilege('MPVT') || rmmapi.getRolePrivilege('VPVT')=='false' ? true : null"
+                        name="RegulationGroups" class="kendo_custom_dropdown" [data]="allRegulationGroups"
+                        textField="Name" [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="true"
+                        [(ngModel)]="propertyValueTypesModel.ChecklistRegulationGroupId" #RegulationGroups="ngModel"
+                        (valueChange)="OnRegulationGroupsChange($event)"
+                        [ngClass]="{ 'is-invalid ng-invalid ng-touched': PropertyValueTypesform.submitted && PropertyValueTypesform.controls.RegulationGroups.invalid }"
+                        required>
+                      </kendo-dropdownlist>
+                      <div
+                        *ngIf="PropertyValueTypesform.submitted && PropertyValueTypesform.controls.RegulationGroups.invalid"
+                        class="invalid-feedback">This field is Required.</div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Regulation Property <span class="mandatory"> </span>
+                            </em> </span> </label>
+                      </div>
+                      <kendo-dropdownlist
+                        [disabled]="!rmmapi.getRolePrivilege('MPVT') || rmmapi.getRolePrivilege('VPVT')=='false' ? true : null"
+                        name="RegulationProperties" class="kendo_custom_dropdown" [data]="allRegulationProperties"
+                        textField="Name" [defaultItem]="rpdefaultItem" valueField="Id" [valuePrimitive]="true"
+                        [(ngModel)]="propertyValueTypesModel.ChecklistRegulationPropertiesId"
+                        #RegulationProperties="ngModel" (valueChange)="IsCheckPropertyValueTypesInfo()"
+                        [ngClass]="{ 'is-invalid ng-invalid ng-touched': PropertyValueTypesform.submitted && PropertyValueTypesform.controls.RegulationProperties.invalid }"
+                        required>
+                      </kendo-dropdownlist>
+                      <div
+                        *ngIf="PropertyValueTypesform.submitted && PropertyValueTypesform.controls.RegulationProperties.invalid"
+                        class="invalid-feedback">This field is Required.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-6">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Property Value Type Option <span class="mandatory">
+                              </span> </em> </span> </label>
+                      </div>
+                      <kendo-dropdownlist
+                        [disabled]="!rmmapi.getRolePrivilege('MPVT') || rmmapi.getRolePrivilege('VPVT')=='false' ? true : null"
+                        name="PropertyValueTypeOption" class="kendo_custom_dropdown" [data]="allPropertyValueTypeOption"
+                        textField="PropertyValueTypeOption" [defaultItem]="pvtodefaultItem" valueField="Id"
+                        [valuePrimitive]="true" [(ngModel)]="propertyValueTypesModel.PropertyValueTypeOptionId"
+                        #PropertyValueTypeOption="ngModel" (valueChange)="IsCheckPropertyValueTypesInfo()"
+                        [ngClass]="{ 'is-invalid ng-invalid ng-touched': PropertyValueTypesform.submitted && PropertyValueTypesform.controls.PropertyValueTypeOption.invalid }"
+                        required>
+                      </kendo-dropdownlist>
+                      <div
+                        *ngIf="PropertyValueTypesform.submitted && PropertyValueTypesform.controls.PropertyValueTypeOption.invalid"
+                        class="invalid-feedback"> This field is Required.
+
+                      </div>
+                      <div class="invalid-feedback" *ngIf="IsCheckPropertyValueTypes">Property Value Type already
+                        exists..!</div>
+                    </div>
+                    <div class="col-md-6">
+                      <div class="combo-label">
+                        <label for="HealthAuthority"> <span> <em> Compliance Status <span class="mandatory"> </span>
+                            </em> </span> </label>
+                      </div>
+                      <kendo-dropdownlist
+                        [disabled]="!rmmapi.getRolePrivilege('MPVT') || rmmapi.getRolePrivilege('VPVT')=='false' ? true : null"
+                        name="StatusId" class="kendo_custom_dropdown" [data]="statusList" textField="Name"
+                        [defaultItem]="rpdefaultItem" valueField="Id" [valuePrimitive]="true"
+                        [(ngModel)]="propertyValueTypesModel.StatusId" #PropertyValueTypeOption="ngModel"
+                        [ngClass]="{ 'is-invalid ng-invalid ng-touched': PropertyValueTypesform.submitted && PropertyValueTypesform.controls.StatusId.invalid }"
+                        required>
+                      </kendo-dropdownlist>
+                      <div *ngIf="PropertyValueTypesform.submitted && PropertyValueTypesform.controls.StatusId.invalid"
+                        class="invalid-feedback"> This field is Required.
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="modal.dismiss('Cross click')"
+                  class="btn btn-outline-light btn-radius">Cancel</button>
+                <button type="submit" class="btn btn-primary btn-save btn-radius ripple"
+                  *ngIf="(rmmapi.getRolePrivilege('MPVT') && rmmapi.getRolePrivilege('VPVT'))|| (rmmapi.getRolePrivilege('MPVT'))||(rmmapi.getRolePrivilege('VPVT') && !rmmapi.getRolePrivilege('VPVT'))">{{
+                  actionType ? 'Save' :"Update" }}</button>
+              </div>
+            </form>
+          </ng-template>
+          <ng-template #InActiveModal let-modal>
+            <div class="modal-body modal-body-sm">
+              <div class="text-center">
+                <div class="avatar-md">
+                  <div class="avatar-title">
+                    <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                  </div>
+                </div>
+                <div class="row justify-content-center">
+                  <h6> Are you sure you want to inactivate the Property Value Type?</h6>
+                </div>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-primary btn-no btn-radius "
+                (click)="modal.dismiss('Cross click')">No</button>
+              <button type="button" class="btn btn-outline-light btn-radius"
+                (click)="DeletePropertyValueTypesInfo()">Yes</button>
+            </div>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

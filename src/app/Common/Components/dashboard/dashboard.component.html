@@ -1,0 +1,140 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <div class="dashboard-container">
+      <div class="dashboard-panel">
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card custom-card">
+              <div class="card-header">
+                Raw Materials by Supplier Countries
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <div class="col">
+                    <!-- <ng-template #templateRSC let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                    </ng-template> -->
+                    <kendo-grid kendoTooltip class="k-grid-custom"
+                      [data]="countrywiseRawMaterialSuppliers" height="207">
+                      <kendo-grid-column field="Name" title="Country Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="TotalRecords" title="Raw Material Suppliers" width="">
+                      </kendo-grid-column>
+                    </kendo-grid>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card custom-card">
+              <div class="card-header">
+                Review Comments
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <ng-template #template let-anchor>
+                    <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+
+                  
+
+                  <div class="col" kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" #tooltipReview="kendoTooltip"
+                    (mouseover)="showTooltip($event, tooltipReview)">
+                    <kendo-grid class="k-grid-custom" [data]="formulationReviewComments" height="207">
+                        <kendo-grid-column field="FormulationReferenceNo" title="Formulation Reference Number" width=""> </kendo-grid-column>
+                        <kendo-grid-column field="VersionNo" title="Version Number" width=""> </kendo-grid-column>
+                        <kendo-grid-column field="Comment" title="Comment" width=""></kendo-grid-column>
+                      <kendo-grid-column title="Actions" width="90">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list">
+                            <button aria-label="Reply" data-balloon-pos="left" class="btn btn-sm btn-light"
+                              (click)="EditReviewComment(dataItem, 'Reply')"><span class="fa-reply btn-light-danger"></span></button>
+                            <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+                              (click)="EditReviewComment(dataItem,'Edit')"><span class="fa-edit"></span></button>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card custom-card">
+              <div class="card-header">
+                Formulations (Being Updated)
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <ng-template #templateFBU let-anchor>
+                    <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+                  <div class="col" kendoTooltip showOn="none" [tooltipTemplate]="templateFBU" filter=".k-grid td" #tooltipFormulation="kendoTooltip"
+                  (mouseover)="showTooltip($event, tooltipFormulation)">
+                    <kendo-grid class="k-grid-custom" [data]="formulationDetails" height="207">
+                      <kendo-grid-column field="ProductName" title="Product Name" width=""> </kendo-grid-column>
+                      <!-- <kendo-grid-column field="ProductName" title="Product Name" width="">
+                        <ng-template kendoGridCellTemplate let-column let-columnIndex="columnIndex" title="column.field">
+                          {{ column.field }}({{ columnIndex }})
+                        </ng-template>
+                      </kendo-grid-column> -->
+                    <kendo-grid-column field="FormulationReferenceNo" title="Formulation Reference and Version Nos."
+                      width=""></kendo-grid-column>
+                    <kendo-grid-column title="Actions" width="80">
+                      <ng-template kendoGridCellTemplate let-dataItem>
+                        <div class="k-grid-action-list">
+                          <!-- <button aria-label="View" data-balloon-pos="left" class="btn btn-sm btn-light"
+                                (click)="GotoFormulationDetails(dataItem,'View')"><span class="fa-view"></span></button> -->
+                          <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+                            (click)="GotoFormulationDetails(dataItem,'View')"><span class="fa-edit"></span></button>
+                        </div>
+                      </ng-template>
+                    </kendo-grid-column>
+                  </kendo-grid>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+          <div class="col-md-6">
+            <div class="card custom-card">
+              <div class="card-header">
+                Raw Material Documents Compliance
+              </div>
+              <div class="card-body">
+                <div class="row">
+                  <ng-template #templateRMDC let-anchor>
+                    <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+
+                  <div class="col" kendoTooltip showOn="none" [tooltipTemplate]="templateRMDC" filter=".k-grid td" 
+                  #tooltipRMDoc="kendoTooltip" (mouseover)="showTooltip($event, tooltipRMDoc)">
+                    <kendo-grid class="k-grid-custom" [data]="rawMaterialDocument" height="207">
+                      <kendo-grid-column field="RawMaterialName" title="Raw Material Name & Code" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="SupplierName" title="Supplier Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="DocumentName" title="Document Name" width=""></kendo-grid-column>
+                      <kendo-grid-column title="Actions" width="80">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list">
+                            <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light"
+                              (click)="GotoRawMaterialDetails(dataItem,'Edit')"><span class="fa-edit"></span></button>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                    <div *ngIf="isRawMaterialLoading" class="k-loading-mask k-i-loading"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>       
+      </div>
+    </div>
+  </div>
+</div>

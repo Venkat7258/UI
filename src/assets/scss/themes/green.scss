@@ -1,0 +1,20 @@
+$primary: #671cc9;
+$sidebarcolor: #f4ecfa;
+$hover-color: #f4ecfa;
+$codecolor: #671cc9;
+$green-value-map: (
+    name: "green",
+    text-color: $gray-800,
+    background-color: $white,
+    active-color: $primary,
+    button-color: $primary,
+    sidebar-color: $sidebarcolor,
+    hover-color: $hover-color,
+    code-color: $codecolor,
+    button-text-color: $white,
+    button-bg-disable: $gray-200,
+    button-border-disable: $gray-400,
+    button-text-color-disable:$gray-700,
+
+
+);

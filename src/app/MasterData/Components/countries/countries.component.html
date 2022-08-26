@@ -1,0 +1,169 @@
+<div class="row">
+    <div class="col">
+        <div class="content-grid">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                        <div class="bd-highlight flex-left">
+                            <span> <em> Countries </em></span>
+                        </div>
+                        <div class="flex-grow-1 bd-highlight flex-left">
+                            <span> </span>
+                        </div>
+                        <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('AC')">
+                            <button type="button" class="btn btn-primary btn-radius ripple"
+                                (click)="AddCountries(Countries)"> <i class="fa fa-plus"> </i> Country
+                            </button>
+                        </div>
+                    </div>
+                    <ng-template #template let-anchor>
+                        <span>{{ anchor.nativeElement.innerText }}</span>
+                    </ng-template>
+                    <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+
+                    <kendo-grid class="k-grid-custom" [data]="countriesList" *ngIf="rmmapi.getRolePrivilege('CL')"
+                                [pageable]="{
+                                    buttonCount: this.searchFilter.buttonCount,
+                                    info: true,
+                                    type: type,
+                                    pageSizes: true,
+                                    previousNext: true,
+                                    position: position }" 
+                                [pageSize]="this.searchFilter.pageSize" 
+                                [skip]="this.searchFilter.pageSkip"
+                                [sortable]="{ allowUnsort: false, mode: 'single'}"
+                                [sort]="sort"
+                                (sortChange)="sortChange($event)"
+                                (pageChange)="pageChange($event)">
+                    
+
+                        <kendo-grid-column field="Name" title="Country" width=""> </kendo-grid-column>
+                        <kendo-grid-column field="Code" title="Code" width=""></kendo-grid-column>
+                        <kendo-grid-column field="RegionName" title="Region" width=""></kendo-grid-column>
+                        <kendo-grid-column title="Actions" width="90">
+                            <ng-template kendoGridCellTemplate let-dataItem>
+                                <div class="k-grid-action-list">
+                                    <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light" *ngIf="rmmapi.getRolePrivilege('MC')||rmmapi.getRolePrivilege('VC')"
+                                        (click)="CountriesEdit(Countries,dataItem)">
+                                        <span class="fa-edit"></span></button>
+                                    <button aria-label="Inactivate" data-balloon-pos="left" *ngIf="rmmapi.getRolePrivilege('IC')"
+                                        class="btn btn-sm btn-light btn-light-danger "
+                                        (click)="InActiveModalInfo(InActiveModal, dataItem)">
+                                        <span class="fa-ban"></span></button>
+                                </div>
+                            </ng-template>
+                        </kendo-grid-column>
+                    </kendo-grid>
+                    </div>
+                    <ng-template #Countries let-modal>
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Country' :"Edit Country"
+                                }}</h5>
+                            <button type="button" class="close" aria-label="Close"
+                                (click)="modal.dismiss('Cross click')">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div>
+                            <form id="frm_Countries" name="form" [formGroup]="Countriesform"
+                                (ngSubmit)=" SaveCountry(Countriesform.value)">
+                                <div class="modal-body">
+
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="combo-label">
+                                                    <label for="MarketName"> <span> <em> Country Name <span
+                                                                    class="mandatory"></span> </em> </span></label>
+                                                </div>
+                                                <input type="text"  appInputTrim maxlength="100" class="form-control" name="CountryName"
+                                                    [(ngModel)]="Model.Name" placeholder=""
+                                                    formControlName="CountryName"
+                                                    [ngClass]="{'is-invalid':(Countriesform.controls.CountryName.errors?.required) && (Countriesform.controls.CountryName.touched || submitted) }"
+                                                    formControlName="CountryName" placeholder="" (blur)="checkDuplicate()" >
+
+                                                    <div class="invalid-feedback"
+                                                    *ngIf="!isDuplicateCountry && (Countriesform.controls.CountryName.errors?.required) &&  (Countriesform.controls.CountryName.touched || submitted)">
+                                                    This field is required.</div>
+                                                 <div class="invalid-feedback" *ngIf="isDuplicateCountry">{{env.ValidationMessages.Thisvaluealreadyexists }}</div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="combo-label">
+                                                    <label for="Code"><span><em> Country Code <span
+                                                                    class="mandatory"></span> </em></span></label>
+                                                </div>
+                                                    <input type="text"  appInputTrim maxlength="10" class="form-control" name="Code"
+                                                    [(ngModel)]="Model.Code" placeholder="" formControlName="Code" 
+                                                    [ngClass]="{'is-invalid':(Countriesform.controls.Code.errors?.required) && (Countriesform.controls.Code.touched || submitted) }"
+                                                    placeholder="" (blur)="checkDuplicateCode()" >
+
+                                                    <div class="invalid-feedback"
+                                                    *ngIf="!isDuplicateCode && Countriesform.controls.Code.errors?.required && (Countriesform.controls.Code.touched || submitted)">
+                                                    This field is required.</div>
+                                                 <div class="invalid-feedback" *ngIf="isDuplicateCode">{{env.ValidationMessages.Thisvaluealreadyexists }}</div>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="combo-label">
+                                                    <label for="HealthAuthority"> <span> <em>Region <span
+                                                                    class="mandatory"></span> </em></span></label>
+                                                </div>
+                                                <kendo-dropdownlist name="Region" class="kendo_custom_dropdown"
+                                                    [data]="AllRegions" textField="Name" [defaultItem]="defaultItem"
+                                                    valueField="Id" [valuePrimitive]="true" [(ngModel)]="Model.RegionId"
+                                                    formControlName="Region">
+                                                </kendo-dropdownlist>
+                                                <div *ngIf="Countriesform.controls.Region.errors?.required && Countriesform.controls.Region.touched"
+                                                    class="invalid-feedback">
+                                                    This field is required.</div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-outline-light btn-radius"
+                                        (click)="modal.dismiss('Cross click')">Cancel</button>
+                                    <button type="submit" class="btn btn-primary btn-save btn-radius ripple" *ngIf="(rmmapi.getRolePrivilege('MC') && rmmapi.getRolePrivilege('VC'))|| (rmmapi.getRolePrivilege('MC'))||(rmmapi.getRolePrivilege('VC') && !rmmapi.getRolePrivilege('VC'))" 
+                                     >{{
+                                        actionType ? 'Save' :"Update" }}</button>
+
+                                </div>
+                            </form>
+                        </div>
+
+                    </ng-template>
+                    <ng-template #InActiveModal let-modal>
+
+                        <div class="modal-body modal-body-sm">
+                            <div class="text-center">
+                                <div class="avatar-md">
+                                    <div class="avatar-title">
+                                        <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                                    </div>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <h6>Are you sure you want to inactivate the Country?</h6>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-primary btn-no btn-radius"
+                                (click)="modal.dismiss('Cross click')">No</button>
+                            <button type="button" class="btn btn-outline-light btn-radius"
+                                (click)="DeleteCountries(dataItem)">Yes</button>
+                        </div>
+                    </ng-template>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

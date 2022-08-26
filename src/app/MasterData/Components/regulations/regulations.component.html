@@ -1,0 +1,238 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"> <a [routerLink]="['/Dashboard']"> Home </a></li>
+        <li class="breadcrumb-item"> <a [routerLink]="['/Masterdata']"> Master Data </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{moduleNameBreadCum}}</li>
+      </ol>
+    </nav>
+    <div class="nav-tabs-custom"> 
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a [class.active]="moduleName=='Regulations'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" role="tab" (click)="tabchange('Regulations')" aria-controls="nav-home"
+          aria-selected="true">
+          <span> Regulations </span>
+        </a>
+        <a [class.active]="moduleName=='ChecklistRegulationGroups'" class="nav-link" id="nav-profile-tab"
+          data-toggle="tab" href="javascript:void(0)" role="tab" (click)="tabchange('ChecklistRegulationGroups')"
+          role="tab" aria-controls="nav-profile" aria-selected="false">
+          <span>Checklist Regulation Groups </span>
+        </a>
+        <a [class.active]="moduleName=='ChecklistRegulationProperties'" class="nav-link" id="nav-contact-tab"
+          data-toggle="tab" href="javascript:void(0)" role="tab" (click)="tabchange('ChecklistRegulationProperties')"
+          role="tab" aria-controls="nav-contact" aria-selected="false">
+          <span>Checklist Regulation Properties </span>
+        </a>
+        <a [class.active]="moduleName=='PropertyValueTypes'" class="nav-link" id="nav-contact-tab" data-toggle="tab"
+          href="javascript:void(0)" role="tab" (click)="tabchange('PropertyValueTypes')" role="tab"
+          aria-controls="nav-contact" aria-selected="false">
+          <span> Property Value Types </span>
+        </a>
+
+        <a [class.active]="moduleName=='PropertyValueTypeOptions'" class="nav-link" id="nav-contact-tab"
+          data-toggle="tab" href="javascript:void(0)" role="tab" (click)="tabchange('PropertyValueTypeOptions')"
+          role="tab" aria-controls="nav-contact" aria-selected="false">
+          <span> Property Value Type Options </span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade active" [class.show]="moduleName=='Regulations'" id="nav-tab1" role="tabpanel"
+        aria-labelledby="nav-home-tab">
+        <ng-container *ngIf="moduleName=='Regulations'">
+
+          <div class="row">
+            <div class="col">
+              <div class="content-grid">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                      <div class="bd-highlight flex-left">
+                        <span> <em>  Regulations </em> </span>
+                      </div>
+                      <div class="flex-grow-1 bd-highlight flex-left">
+                        <span> </span>
+                      </div>
+                      <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('ARE')">
+                        <button (click)="OpenRegulationPopup(Regulation)" type="button" data-toggle="modal"
+                          data-target="#myModal" class="btn btn-primary btn-radius ripple"> <i class="fa fa-plus"></i>
+                          Regulation
+                        </button>
+                      </div>
+                    </div>
+                    <ng-template #template let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+                  <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+                    <kendo-grid class="k-grid-custom" [data]="regulationList" *ngIf="rmmapi.getRolePrivilege('REL')"
+                                [pageable]="{
+                                  buttonCount: this.searchFilter.buttonCount,
+                                  info: true,
+                                  type: numeric,
+                                  pageSizes: true,
+                                  previousNext: true,
+                                  position: bottom }"  
+                                [pageSize]="this.searchFilter.pageSize" 
+                                [skip]="this.searchFilter.pageSkip"
+                                [sortable]="{ allowUnsort: false, mode: 'single'}"
+                                [sort]="sort"
+                                (sortChange)="sortChange($event)"
+                                (pageChange)="pageChange($event)">
+                      <kendo-grid-column field="Name" title="Regulation Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="RegionName" title="Region" width=""></kendo-grid-column>
+                      <kendo-grid-column field="MarketName" title="Market" width=""></kendo-grid-column>
+                      <kendo-grid-column title="Actions" width="90">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list"> 
+                          <button aria-label="View/ Edit" data-balloon-pos="left"  class="btn btn-sm btn-light" *ngIf="rmmapi.getRolePrivilege('MRE') || rmmapi.getRolePrivilege('VRE')"
+                            (click)="EditRegulation(Regulation,dataItem)"><span class="fa-edit"></span></button>
+                          <button aria-label="Inactivate" data-balloon-pos="left" class="btn btn-sm btn-light btn-light-danger" *ngIf="rmmapi.getRolePrivilege('IRE')"
+                            (click)="InActiveModalInfo(InActiveModal,dataItem)"><span class="fa-ban"></span></button>
+                            </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                    </div>
+                    <ng-template #Regulation let-modal>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modal-basic-title">{{formTitle}}</h5>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div class="modal-body">
+                        <form id="frm_Markets" name="form" [formGroup]="regulationsform">
+                          <div class="form-group">
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="combo-label"> 
+                                <label for="MarketName"> <span> <em> Regulation Name <span class="mandatory"> </span> </em> </span> </label>
+                              </div>
+                                <input type="text"  appInputTrim maxlength="100" class="form-control" name="RegulationName" 
+                                [(ngModel)]="model.Name"
+                                [ngClass]="{'is-invalid': regulationsform.controls.name.errors?.required && regulationsform.controls.name.touched && regulationsform.submitted }"
+                                formControlName="name" placeholder="" (blur)="CheckDuplicate()">
+                                <div
+                                  *ngIf="regulationsform.controls.name.errors?.required && regulationsform.controls.name.touched"
+                                  class="invalid-feedback">
+                                  This field is required.</div>
+                                <div *ngIf="isDuplicateRegulation" class="invalid-feedback">{{this.env.ValidationMessages.Thisvaluealreadyexists}}</div>
+                              </div>
+                              <div class="col-md-6">
+                                <div class="combo-label"> 
+                                <label for="Market"> <span> <em> Market  </em> </span> </label>
+                              </div>
+                                <kendo-formfield>
+                                  <kendo-dropdownlist class="kendo_custom_dropdown" name="Market" [data]="allMarkets"
+                                    textField="Name" valueField="Id" [valuePrimitive]="true"
+                                    [(ngModel)]="model.MarketId" formControlName="marketId"
+                                    (valueChange)="OnMarketChange($event)" [defaultItem]="defaultItem">
+                                  </kendo-dropdownlist>
+                                  <div
+                                    *ngIf="regulationsform.controls.marketId.errors?.required && regulationsform.controls.marketId.touched"
+                                    class="invalid-feedback">
+                                    This field is required.</div>
+                                </kendo-formfield>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div class="form-group">
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="combo-label">
+                                  <label for="Region"> <span> <em> Region</em> </span> </label>
+                                </div>
+                                <kendo-formfield>
+                                  <kendo-dropdownlist name="Region" class="kendo_custom_dropdown" [data]="allRegions"
+                                    textField="RegionName" valueField="RegionId" [valuePrimitive]="true"
+                                    [(ngModel)]="model.RegionId" formControlName="regionId" disabled>
+                                  </kendo-dropdownlist>
+                                  <div
+                                    *ngIf="regulationsform.controls.regionId.errors?.required && regulationsform.controls.regionId.touched"
+                                    class="invalid-feedback">
+                                    This field is required.</div>
+                                </kendo-formfield>
+                              </div>
+                            </div>
+                          </div>
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-light btn-radius"
+                          (click)="modal.dismiss('Cross click')">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-save btn-radius  ripple" *ngIf="(rmmapi.getRolePrivilege('MRE') && rmmapi.getRolePrivilege('VRE'))|| (rmmapi.getRolePrivilege('MRE'))||(rmmapi.getRolePrivilege('VRE') && !rmmapi.getRolePrivilege('VRE'))"
+                          (click)="SaveRegulation()">{{buttonName}}</button>
+
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </ng-container>
+        <ng-template #InActiveModal let-modal>
+          <!-- <div class="modal-header">
+          <h6 class="modal-title" id="modal-basic-title">Regulation</h6>
+          <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div> -->
+          <div class="modal-body modal-body-sm">
+            <div class="text-center">
+              <div class="avatar-md">
+                <div class="avatar-title">
+                  <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                </div>
+              </div>
+              <div class="row justify-content-center">
+                <h6> Are you sure you want to inactivate the Regulation?</h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-no ripple btn-radius"
+              (click)="modal.dismiss('Cross click')">No</button>
+            <button type="button" class="btn btn-outline-light btn-radius" (click)="DeleteRegulation()">Yes</button>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="tab-pane fade active" [class.show]="moduleName=='ChecklistRegulationGroups'" id="nav-tab2"
+        role="tabpanel" aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='ChecklistRegulationGroups'">
+          <app-regulationgroups></app-regulationgroups>
+        </ng-container>
+      </div>
+
+
+      <div class="tab-pane fade active" id="nav-tab3" [class.show]="moduleName=='ChecklistRegulationProperties'"
+        role="tabpanel" aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='ChecklistRegulationProperties'">
+          <app-regulation-properties></app-regulation-properties>
+        </ng-container>
+      </div>
+
+      <div class="tab-pane fade active" id="nav-tab3" [class.show]="moduleName=='PropertyValueTypes'" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='PropertyValueTypes'">
+          <app-property-value-types></app-property-value-types>
+        </ng-container>
+      </div>
+
+      <div class="tab-pane fade active" id="nav-tab3" [class.show]="moduleName=='PropertyValueTypeOptions'"
+        role="tabpanel" aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='PropertyValueTypeOptions'">
+          <app-property-value-type-options></app-property-value-type-options>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,267 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"> <a [routerLink]="['/Dashboard']"> Home </a></li>
+        <li class="breadcrumb-item"> <a  href="javascript:void(0)" (click)="redirectGridPage()"> Raw Material </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{moduleName}}</li>
+      </ol>
+    </nav>
+    <div class="nav-tabs-custom">
+      <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+          <a [class.active]="moduleName=='General Details'" class="nav-link" data-toggle="tab" href="javascript:void(0)"
+            (click)="Tabchange('General Details')" role="tab" aria-controls="nav-home">
+            <span> General Details </span>
+          </a>
+          <a [class.active]="moduleName=='Sub-component Details'" class="nav-link" data-toggle="tab"
+            href="javascript:void(0)" (click)="Tabchange('Sub-component Details')" role="tab" aria-controls="nav-home">
+            <span> Sub-component Details </span>
+          </a>
+          <a [class.active]="moduleName=='Document Details'" class="nav-link" data-toggle="tab"
+            href="javascript:void(0)" (click)="Tabchange('Document Details')" role="tab" aria-controls="nav-home">
+            <span> Document Details </span>
+          </a>
+          <a [class.active]="moduleName=='Checklist Details'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+            href="javascript:void(0)" (click)="Tabchange('Checklist Details')" role="tab" aria-controls="nav-home">
+            <span> Checklist Details </span>
+          </a>
+        </div>
+      </nav>
+    </div>
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade active" [class.show]="moduleName=='General Details'" id="nav-tab1" role="tabpanel"
+        aria-labelledby="nav-home-tab">
+        <ng-container *ngIf="moduleName=='General Details'">
+          <div class="row">
+            <div class="col">
+              <div class="formulation-card-body-vh">
+                <div class="content-grid">
+                  <div class="card">
+                    <div class="card-body">
+                      <div class="d-flex bd-highlight page_title_section">
+                        <div class="bd-highlight flex-left">
+                          <span> <em> General Details </em> </span>
+                        </div>
+                        <div class="flex-grow-1 bd-highlight flex-left">
+                          <span> </span>
+                        </div>
+                        <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('AP')">
+
+                          <button type="button" class="btn btn-outline-primary btn-radius m-l-10"
+                            (click)="Tabchange('Sub-component Details')"> <i class="fa fa-long-arrow-right"></i> Next
+                          </button>
+                        </div>
+                      </div>
+                      <div class="p-md-4">
+                        <form id="frm_RawMaterial" name="form" #RawMaterialform="ngForm"
+                          (ngSubmit)="RawMaterialform.form.valid && AddSupplierRawMaterialDetailsInfo(RawMaterialform.value)">
+                          <div>
+                            <div class="form-group view-form-group">
+                              <div class="view-item">
+                                <div class="row">
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""> <span><em> Raw Material Name and Code </em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.RawMaterialName}}</span>
+                                  </div>
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""><span><em> Supplier </em></span></label>
+                                    </div>
+                                    <span class="">{{this.rawMaterialModel.SupplierName}}</span>
+                                  </div>
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""><span><em>Manufacturer</em></span> </label>
+                                    </div>
+                                    <span class="">{{this.rawMaterialModel.ManufacturerName}}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group view-form-group">
+                              <div class="view-item">
+                                <div class="row">
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""> <span><em>Functions</em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.RawMaterialFunctionName}}</span>
+                                  </div>
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""><span><em>Trade Name</em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.TradeName}}</span>
+                                  </div>
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""> <span><em>Created By</em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.CreatedBy}}</span>
+                                  </div>
+
+
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group view-form-group">
+                              <div class="view-item">
+                                <div class="row">
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""> <span><em>Created Date</em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.CreatedDate |date: 'MMMM d, y'}}</span>
+                                  </div>
+                                  <div class="col-4">
+                                    <div class="combo-label">
+                                      <label for=""><span><em>Updated By</em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.UpdatedBy}}</span>
+                                  </div>
+                                  <div class="col-md-4">
+                                    <div class="combo-label">
+                                      <label for=""><span><em>Updated Date</em></span></label>
+                                    </div>
+                                    <span class="">{{rawMaterialModel.UpdatedDate | date: 'MMMM d, y'}}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-4">
+                                  <div class="combo-label">
+                                    <label for="exampleInputPassword1"> <span><em>Status </em></span> </label>
+                                  </div>
+                                  <span class="">{{rawMaterialModel.StatusName}} </span>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="exampleInputPassword1"> <span ><em> Is the Substance an SVHC?
+                                       <span class="mandatory"></span> </em></span> </label>
+                                  </div>
+                                  <kendo-dropdownlist [readonly]='!AccessToMRM' name="IsSubstancesSVHC"
+                                    class="kendo_custom_dropdown" [data]="substanceanSVHC" textField="Name"
+                                    [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="true"
+                                    [(ngModel)]="rawMaterialModel.IsSubstancesSVHC" #IsSubstancesSVHC="ngModel"
+                                    [ngClass]="{ 'is-invalid ng-invalid ng-touched': RawMaterialform.submitted && IsSubstancesSVHC.invalid }"
+                                    required>
+                                  </kendo-dropdownlist>
+                                  <div *ngIf="RawMaterialform.submitted && IsSubstancesSVHC.invalid"
+                                    class="invalid-feedback">
+                                    <div *ngIf="IsSubstancesSVHC.errors.required">
+                                      {{env.ValidationMessages.requiredRMGeneralDetailsMsg}}</div>
+                                  </div>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="exampleInputEmail1"> <span><em> Is Nanomaterial present?
+                                      <span class="mandatory"></span></em></span></label>
+                                  </div>
+                                  <kendo-dropdownlist [readonly]='!AccessToMRM' name="IsNanoMaterial"
+                                    [defaultItem]="defaultItem" class="kendo_custom_dropdown" [data]="allIsNanoMaterial"
+                                    textField="Name" valueField="Id" [valuePrimitive]="true"
+                                    [(ngModel)]="rawMaterialModel.IsNanoMaterial"
+                                    (valueChange)="OnNanomaterialPresentChange($event)" #IsNanoMaterial="ngModel"
+                                    [ngClass]="{ 'is-invalid ng-invalid ng-touched': RawMaterialform.submitted && IsNanoMaterial.invalid }"
+                                    required>
+                                  </kendo-dropdownlist>
+                                  <div *ngIf="RawMaterialform.submitted && IsNanoMaterial.invalid"
+                                    class="invalid-feedback">
+                                    <div *ngIf="IsNanoMaterial.errors.required">
+                                      {{env.ValidationMessages.requiredRMGeneralDetailsMsg}}</div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for="exampleInputEmail1"> <span><em> Nano Material Markets </em></span>
+                                    </label>
+                                  </div>
+                                  <kendo-dropdownlist [readonly]='!AccessToMRM'
+                                    [disabled]='!rawMaterialModel.IsNanoMaterial' name="NanoMaterialMarket"
+                                    class="kendo_custom_dropdown" [data]="AllMarkets" textField="Name"
+                                    [defaultItem]="marketsDefaultItem" valueField="Id" [valuePrimitive]="true"
+                                    [(ngModel)]="rawMaterialModel.NanoMaterialMarketId" #NanoMaterialMarket="ngModel">
+                                  </kendo-dropdownlist>
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for=""> <span><em> Reach (or Reach-like) Registration Number/
+                                          Status</em></span></label>
+                                  </div>
+                                  <input [readonly]='!AccessToMRM' type="text"  appInputTrim class="form-control"
+                                    name="REAChNumberOrStatus" maxlength="100"
+                                    [(ngModel)]="rawMaterialModel.REAChNumberOrStatus" placeholder=""
+                                    #REAChNumberOrStatus="ngModel">
+                                </div>
+                                <div class="col-md-4">
+                                  <div class="combo-label">
+                                    <label for=""> <span><em> Only Reach-representative Details </em></span> </label>
+                                  </div>
+                                  <input [readonly]='!AccessToMRM' type="text"  appInputTrim class="form-control"
+                                    name="OnlyRepresentativeDetails" maxlength="100"
+                                    [(ngModel)]="rawMaterialModel.OnlyRepresentativeDetails" placeholder=""
+                                    #OnlyRepresentativeDetails="ngModel">
+                                </div>
+                              </div>
+                            </div>
+
+                            <!-- <div class="form-group">
+                                      <div class="row">
+                                        <div class="col-md-4">
+                                          <div class="combo-label">
+                                            <label for=""> <span><em> Only Representative Details (Reach) </em></span> </label>
+                                          </div>
+                                          <input type="text"  appInputTrim class="form-control" name="OnlyRepresentativeDetails"
+                                            [(ngModel)]="rawMaterialModel.OnlyRepresentativeDetails" placeholder="" #OnlyRepresentativeDetails="ngModel">
+                                        </div>
+                                      </div>
+                                    </div> -->
+                            <div class="text-center">
+                              <button type="submit" class="btn btn-primary btn-radius btn-radius m-l-10" *ngIf="rmmapi.getRolePrivilege('MRM')"> {{ actionType
+                                ? 'Save' :"Update" }}</button>
+                            </div>
+                          </div>
+                          <!-- <div *ngIf="isLoading" class="k-i-loading"></div> -->
+                        </form>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+      <div class="tab-pane fade active" [class.show]="moduleName=='Sub-component Details'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='Sub-component Details'">
+          <app-supplier-raw-material-sub-component-details [supplierRawMaterialDetail]="rawMaterialModel"
+            (informToParent)="Tabchange('Document Details')"></app-supplier-raw-material-sub-component-details>
+        </ng-container>
+      </div>
+      <div class="tab-pane fade active" [class.show]="moduleName=='Document Details'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='Document Details'">
+          <app-supplier-raw-material-document-details [item]="rawMaterialModel"
+            (informToParent)="Tabchange('Checklist Details')"></app-supplier-raw-material-document-details>
+        </ng-container>
+      </div>
+      <div class="tab-pane fade active" [class.show]="moduleName=='Checklist Details'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="moduleName=='Checklist Details'">
+          <app-supplier-raw-material-data-checks [supplierRawMaterialDetailId]="rawMaterialModel.Id">
+          </app-supplier-raw-material-data-checks>
+        </ng-container>
+      </div>
+    </div>
+  </div>
+</div>

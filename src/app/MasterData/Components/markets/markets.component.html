@@ -1,0 +1,291 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"> <a [routerLink]="['/Dashboard']"> Home </a></li>
+        <li class="breadcrumb-item"> <a [routerLink]="['/Masterdata']"> Master Data </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ModuleName}}</li>
+      </ol>
+    </nav>
+    <div class="nav-tabs-custom"> 
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+
+        <a [class.active]="ModuleName=='Regions'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="tabchange('Regions')" role="tab" aria-controls="nav-home">
+          <span> Regions </span>
+        </a>
+        <a [class.active]="ModuleName=='Countries'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="tabchange('Countries')" role="tab" aria-controls="nav-home">
+          <span> Countries </span>
+        </a>
+
+        <a [class.active]="ModuleName=='Markets'" class="nav-link" id="nav-contact-tab" data-toggle="nav-tab2"
+          href="javascript:void(0)" (click)="tabchange('Markets')" role="tab" aria-controls="nav-contact">
+          <span> Markets </span>
+        </a>
+
+
+
+      </div>
+    </nav>
+  </div>
+    <div class="tab-content" id="nav-tabContent">
+
+      <div class="tab-pane fade active" [class.show]="ModuleName=='Markets'" id="nav-tab1" role="tabpanel"
+        aria-labelledby="nav-home-tab">
+        <ng-container *ngIf="ModuleName=='Markets'">
+
+          <div class="row">
+            <div class="col">
+              <div class="content-grid">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                      <div class="bd-highlight flex-left">
+                        <span>  <em> Markets </em>  </span>
+                      </div>
+                      <div class="flex-grow-1 bd-highlight flex-left">
+                        <span> </span>
+                      </div>
+                      <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('AM')">
+                        <button type="button" (click)="AddMarket(Markets)" class="btn btn-primary btn-radius ripple"> <i
+                            class="fa fa-plus"></i> Market
+                        </button>
+                      </div>
+                    </div>
+                    <ng-template #template let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+                  <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+                    <kendo-grid class="k-grid-custom" [data]="marketsList" *ngIf="rmmapi.getRolePrivilege('ML')"
+                    [pageable]="{
+                      buttonCount: this.searchFilter.buttonCount,
+                      info: true,
+                      type: type,
+                      pageSizes: true,
+                      previousNext: true,
+                      position: position }" [pageSize]="this.searchFilter.pageSize" [skip]="this.searchFilter.pageSkip"
+                      [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+                      (pageChange)="pageChange($event)">
+
+                      <kendo-grid-column field="Name" title="Market" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="HealthAuthority" title="Health Authority" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column field="RegionName" title="Region" width=""></kendo-grid-column>
+                      <kendo-grid-column title="Countries" width="">
+                        <ng-template kendoGridCellTemplate let-dataItem1>
+                          <div *ngIf="dataItem1.CountriesName.length > 20"><span>{{dataItem1.CountriesName |
+                              slice:0:20}}</span><span>&nbsp;<a href="javascript:void(0)" style="cursor:pointer;"
+                                (click)="MarketCountries(MarketCountries1,dataItem1.CountriesName)">more..</a></span>
+                          </div>
+                          <div *ngIf="dataItem1.CountriesName.length &lt;= 20">{{ dataItem1.CountriesName}}</div>
+                        </ng-template>
+                      </kendo-grid-column>
+
+
+                      <kendo-grid-column title="Actions" width="90">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list">
+                            <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light " *ngIf="rmmapi.getRolePrivilege('MM')||rmmapi.getRolePrivilege('VM')"
+                              (click)="MarketEdit(Markets,dataItem)">
+                              <span class="fa-edit"></span></button>
+                            <button aria-label="Inactivate" data-balloon-pos="left" *ngIf="rmmapi.getRolePrivilege('IM')"
+                              class="btn btn-sm btn-light btn-light-danger "
+                              (click)="InActiveModalInfo(InActiveModal, dataItem)"><span class="fa-ban"></span></button>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                    </div>
+                    <ng-template #Markets let-modal>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Market' :"Edit/View Market" }}
+                        </h5>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+                      <div>
+                        <form id="frm_Markets" name="form" [formGroup]="Marketform"
+                          (ngSubmit)="SaveMarket(Marketform.value)">
+                          <div class="modal-body">
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="combo-label">
+                                    <label for="MarketName"><span><em> Market Name <span class="mandatory"></span></em>
+                                      </span></label>
+                                  </div>
+                                  <input type="text"  appInputTrim maxlength="100" class="form-control" name="MarketName"
+                                    [(ngModel)]="Model.Name" placeholder="" formControlName="MarketName"
+                                    [ngClass]="{ 'is-invalid ng-invalid ng-touched': Marketform.submitted && Marketform.controls.MarketName.invalid }"
+                                    required (blur)="checkDuplicate()">
+
+                                  <div
+                                    *ngIf="!isDuplicateMarket && Marketform.controls.MarketName.invalid && Marketform.submitted "
+                                    class="invalid-feedback"> This field is required.</div>
+                                  <div *ngIf="isDuplicateMarket" class="invalid-feedback">{{marketExists}}</div>
+                                </div>
+                                <div class="col-md-6">
+
+                                  <div class="combo-label">
+                                    <label for="HealthAuthority"> <span><em> Health Authority <span
+                                            class="mandatory"></span></em></span></label>
+                                  </div>
+
+
+                                  <input type="text"  appInputTrim maxlength="100" class="form-control" name="HealthAuthority"
+                                    [(ngModel)]="Model.HealthAuthority" placeholder="" formControlName="HealthAuthority"
+                                    [ngClass]="{ 'is-invalid ng-invalid ng-touched': Marketform.submitted && Marketform.controls.HealthAuthority.invalid }"
+                                    required>
+                                  <div
+                                    *ngIf="Marketform.controls.HealthAuthority.invalid && Marketform.submitted "
+                                    class="invalid-feedback"> This field is required. </div>
+
+                                </div>
+                              </div>
+                            </div>
+
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-6">
+                                  <div class="combo-label">
+                                    <label for="Region"> <span><em> Region <span
+                                            class="mandatory"></span></em></span></label>
+                                  </div>
+                                  <kendo-dropdownlist name="Region" class="kendo_custom_dropdown" [data]="AllRegions"
+                                    textField="Name" valueField="Id" [defaultItem]="defaultItem" [valuePrimitive]="true"
+                                    (valueChange)="GetMarketCountriesByRegion($event)"
+                                    [(ngModel)]="Model.RegionID" required formControlName="Region"
+                                    [ngClass]="{ 'is-invalid': Marketform.submitted && Marketform.controls.Region.invalid }">
+                                  </kendo-dropdownlist>
+                                  <div
+                                    *ngIf="Marketform.controls.Region.invalid && Marketform.submitted"
+                                    class="invalid-feedback">This field is required.</div>
+                                </div>
+
+
+                              </div>
+
+                            </div>
+
+                            <div class="form-group">
+                              <div class="row">
+                                <div class="col-md-12">
+                                  <div class="combo-label">
+                                    <div class="row-tooltip">
+                                      <div class="custom-help-text bottom"> Multiple Countries can be selected </div>
+                                    </div>
+                                    <label for="Countries"> <span> <em> Countries <span class="mandatory"></span> <span class="info_circle getInfo"></span>
+                                        </em></span></label>
+                                  </div>
+                                  <kendo-multiselect name="ddl_Countries" [data]="CountriesData" textField="Name"
+                                    valueField="Id" [(ngModel)]="Model.Countries" formControlName="Countries" required
+                                    [kendoDropDownFilter]="filterSettings">
+                                  </kendo-multiselect>
+                                  <div
+                                    *ngIf="Marketform.controls.Countries.errors?.required && Marketform.controls.Countries.touched"
+                                    class="invalid-feedback">At least one selection is required.</div>
+
+                                </div>
+
+                              </div>
+                            </div>
+
+
+
+
+
+                          </div>
+                          <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-light btn-radius"
+                              (click)="modal.dismiss('Cross click')">Cancel</button>
+                            <button type="submit" class="btn btn-primary btn-save btn-radius ripple" *ngIf="(rmmapi.getRolePrivilege('MM') && rmmapi.getRolePrivilege('VM'))|| (rmmapi.getRolePrivilege('MM'))||(rmmapi.getRolePrivilege('VM') && !rmmapi.getRolePrivilege('VM'))">{{ actionType ?
+                              'Save' :"Update" }}</button>
+                          </div>
+                        </form>
+                      </div>
+
+
+
+                    </ng-template>
+
+                    <ng-template #MarketCountries1 let-modal>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modal-basic-title">Countries</h5>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+
+                      <div class="modal-body">
+                        <ul>
+                          <li *ngFor="let items of countries; let i = index">
+                            {{items}}
+                          </li>
+                        </ul>
+
+
+
+                      </div>
+
+
+
+
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </ng-container>
+        <ng-template #InActiveModal let-modal>
+          <div class="modal-body modal-body-sm">
+            <div class="text-center">
+              <div class="avatar-md">
+                <div class="avatar-title">
+                  <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                </div>
+              </div>
+              <div class="row justify-content-center">
+                <h6>Are you sure you want to inactivate the Market?</h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-no btn-radius"
+              (click)="modal.dismiss('Cross click')">No</button>
+            <button type="button" class="btn btn-outline-light btn-radius" (click)="DeleteMarket()">Yes</button>
+          </div>
+        </ng-template>
+      </div>
+
+
+      <div class="tab-pane fade active" [class.show]="ModuleName=='Countries'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="ModuleName=='Countries'">
+
+          <app-countries></app-countries>
+
+        </ng-container>
+      </div>
+
+
+      <div class="tab-pane fade active" [class.show]="ModuleName=='Regions'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="ModuleName=='Regions'">
+
+          <app-regions></app-regions>
+
+        </ng-container>
+      </div>
+
+
+
+    </div>
+  </div>
+</div>

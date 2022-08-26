@@ -1,0 +1,183 @@
+<div class="container-fluid contentPanel">
+  <div class="content-panel">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb breadcrumb-custom">
+        <li class="breadcrumb-item"> <a [routerLink]="['/Dashboard']"> Home </a></li>
+        <li class="breadcrumb-item"> <a [routerLink]="['/Masterdata']"> Master Data </a></li>
+        <li class="breadcrumb-item active" aria-current="page">{{ModuleName}}</li>
+      </ol>
+    </nav>
+    <div class="nav-tabs-custom"> 
+    <nav>
+      <div class="nav nav-tabs" id="nav-tab" role="tablist">
+        <a [class.active]="ModuleName=='Products'" class="nav-link" id="nav-home-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="tabchange('Products')" role="tab" aria-controls="nav-home"
+          aria-selected="true">
+          <!-- <span class="badge badge-secondary">12</span> <--> <span> Products </span>
+        </a>
+        <a [class.active]="ModuleName=='ProductCategories'" class="nav-link" id="nav-profile-tab" data-toggle="tab"
+          href="javascript:void(0)" (click)="tabchange('ProductCategories')" role="tab" aria-controls="nav-profile"
+          aria-selected="false">
+          <!--  <span class="<!-- badge badge-secondary">19</span> <--> <span> Product Categories </span>
+        </a>
+
+      </div>
+    </nav>
+  </div>
+
+    <div class="tab-content" id="nav-tabContent">
+      <div class="tab-pane fade show active" [class.show]="ModuleName=='Products'" id="nav-tab1" role="tabpanel"
+        aria-labelledby="nav-home-tab">
+        <ng-container *ngIf="ModuleName=='Products'">
+          <div class="row">
+            <div class="col">
+              <div class="content-grid">
+                <div class="card">
+                  <div class="card-body">
+                    <div class="d-flex bd-highlight page_title_section">
+                      <div class="bd-highlight flex-left">
+                        <span> <em>  Products  </em> </span>
+                      </div>
+                      <div class="flex-grow-1 bd-highlight flex-left">
+                        <span> </span>
+                      </div>
+                      <div class="bd-highlight" *ngIf="rmmapi.getRolePrivilege('AP')">
+                        <button (click)="openProductsPopUp(Products)" type="button" data-toggle="modal"
+                          data-target="#myModal" class="btn btn-primary btn-radius ripple">
+                          <i class="fa fa-plus"></i> Product
+                        </button>
+                      </div>
+                    </div>
+                    <ng-template #template let-anchor>
+                      <span>{{ anchor.nativeElement.innerText }}</span>
+                  </ng-template>
+                  <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td" (mouseover)="showTooltip($event)">
+                    <kendo-grid class="k-grid-custom" [data]="productList" *ngIf="rmmapi.getRolePrivilege('PL')"
+                    [pageable]="{
+                      buttonCount: this.searchFilter.buttonCount,
+                        info: true,
+                        type: type,
+                        pageSizes: true,
+                        previousNext: true,
+                        position: position }" 
+                    [pageSize]="this.searchFilter.pageSize" 
+                    [skip]="this.searchFilter.pageSkip"
+                    [sortable]="{ allowUnsort: false, mode: 'single'}"
+                    [sort]="sort"
+                    (sortChange)="sortChange($event)"
+                    (pageChange)="pageChange($event)">
+                      <kendo-grid-column field="Name" title="Product Name" width=""> </kendo-grid-column>
+                      <kendo-grid-column field="ProductCategoryName" title="Product Category" width="">
+                      </kendo-grid-column>
+                      <kendo-grid-column title="Actions" width="90">
+                        <ng-template kendoGridCellTemplate let-dataItem>
+                          <div class="k-grid-action-list">
+                            <button aria-label="View/ Edit" data-balloon-pos="left" class="btn btn-sm btn-light " *ngIf="rmmapi.getRolePrivilege('MP') || rmmapi.getRolePrivilege('VP')" 
+                              (click)="editProducts(Products,dataItem)"> <span class="fa-edit"></span> </button>
+                            <button aria-label="Inactivate" data-balloon-pos="left"
+                              class="btn btn-sm btn-light btn-light-danger " *ngIf="rmmapi.getRolePrivilege('IP')"
+                              (click)="InActiveModalInfo(InActiveModal, dataItem)">
+                              <span class="fa-ban"></span> </button>
+                          </div>
+                        </ng-template>
+                      </kendo-grid-column>
+                    </kendo-grid>
+                    </div>
+
+                    <ng-template #Products let-modal>
+                      <div class="modal-header">
+                        <h5 class="modal-title" id="modal-basic-title"> {{ actionType ? 'Add Product' :"Edit Product" }}
+                        </h5>
+                        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                          <span aria-hidden="true">&times;</span>
+                        </button>
+                      </div>
+
+                      <div class="modal-body">
+                        <form id="frm_Products" name="form" [formGroup]="productsform">
+                          <div class="form-group">
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="combo-label">
+                                  <label for="ProductName"> <span> <em> Product Name <span class="mandatory"> </span>
+                                      </em> </span></label>
+                                </div>
+                                <input type="text"  appInputTrim maxlength="100" class="form-control" name="ProductsName" [(ngModel)]="Model.Name"
+                                [ngClass]="{'is-invalid':(productsform.controls.ProductsName.errors?.required) && (productsform.controls.ProductsName.touched || submitted) }"
+                                  formControlName="ProductsName" placeholder="" (blur)="checkDuplicate()" >
+                                  
+                                <div class="invalid-feedback"
+                                  *ngIf="!isDuplicateProduct && (productsform.controls.ProductsName.errors?.required) && (productsform.controls.ProductsName.touched || submitted)">
+                                  This field is required.</div>
+                                <div class="invalid-feedback" *ngIf="isDuplicateProduct">{{env.ValidationMessages.Thisvaluealreadyexists }}</div>
+
+                              </div>
+                              <div class="col-md-6">
+                                <div class="combo-label">
+                                  <label for="ProductCategory"> <span> <em> Product Category <span class="mandatory">
+                                        </span> </em></span></label>
+                                </div>
+                                <kendo-dropdownlist name="ProductCategory" class="kendo_custom_dropdown"
+                                  [data]="allProductCategories" textField="Name" valueField="Id"
+                                  formControlName="categoriesid" [valuePrimitive]="true"
+                                  [(ngModel)]="Model.ProductCategoriesId" [defaultItem]="defaultItem">
+                                </kendo-dropdownlist>
+                                <div class="invalid-feedback"
+                                  *ngIf="productsform.controls.categoriesid.errors?.required && (productsform.controls.categoriesid.touched || submitted)">
+                                  This field is required.</div>
+                              </div>
+
+
+                            </div>
+                          </div>
+                         
+                        </form>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" (click)="modal.dismiss('Cross click')"
+                          class="btn btn-outline-light btn-radius">Cancel</button>
+                        <button type="submit" class="btn btn-primary btn-save btn-radius ripple" *ngIf="(rmmapi.getRolePrivilege('MP') && rmmapi.getRolePrivilege('VP'))|| (rmmapi.getRolePrivilege('MP'))||(rmmapi.getRolePrivilege('VP') && !rmmapi.getRolePrivilege('VP'))"
+                          (click)="saveProducts()">{{ actionType ? 'Save' :"Update" }}</button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ng-container>
+        <ng-template #InActiveModal let-modal>
+          <div class="modal-body modal-body-sm">
+            <div class="text-center">
+              <div class="avatar-md">
+                <div class="avatar-title">
+                  <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                </div>
+              </div>
+              <div class="row justify-content-center">
+                <h6> Are you sure you want to inactivate the Product?</h6>
+              </div>
+            </div>
+          </div>
+
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary btn-no btn-radius"
+              (click)="modal.dismiss('Cross click')">No</button>
+            <button type="button" class="btn btn-outline-light btn-radius"
+              (click)="deleteProducts(dataItem)">Yes</button>
+          </div>
+        </ng-template>
+      </div>
+
+      <div class="tab-pane fade active" [class.show]="ModuleName=='ProductCategories'" id="nav-tab2" role="tabpanel"
+        aria-labelledby="nav-profile-tab">
+        <ng-container *ngIf="ModuleName=='ProductCategories'">
+
+          <app-productcategories></app-productcategories>
+
+        </ng-container>
+      </div>
+
+    </div>
+  </div>
+</div>

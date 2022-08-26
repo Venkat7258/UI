@@ -1,0 +1,164 @@
+<div class="row">
+  <div class="col">
+    <div class="content-grid-hierarchy">
+      <div class="formulation-card-body-vh"> 
+        <div class="content-grid"> 
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex bd-highlight page_title_section">
+            <div class="bd-highlight flex-left">
+              <span> <em>  Formulation Summary  </em></span>
+            </div>
+            <div class="flex-grow-1 bd-highlight flex-left">
+              <span></span>
+            </div>
+            <div class="bd-highlight">
+              <span>
+                <button type="button" class="btn btn-outline-primary btn-radius" [disabled]="!isGotoingredientList"
+                  (click)="GotoingredientList()"> <i class="fa fa-long-arrow-right"> </i> Next </button>
+              </span>
+            </div>
+          </div>
+          <ng-template #template let-anchor>
+            <span>{{ anchor.nativeElement.innerText }}</span>
+          </ng-template>
+          <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+            (mouseover)="showTooltip($event)">
+          <div class="tab-content" id="v-pills-tabContent" *ngIf="rmmapi.getRolePrivilege('FL')">
+            <kendo-grid class="k-grid-custom k-grid-hierarchy-custom" [data]="formulationSummuryList" [height]="" [navigable]="true">
+              <kendo-grid-column field="RawMeterialName" title="Raw Material Name and Code" width=""> </kendo-grid-column>
+              <kendo-grid-column field="FunctionName" title="Functions" width=""> </kendo-grid-column>
+              <kendo-grid-column field="SupplierName" title="Supplier" width=""> </kendo-grid-column>
+              <kendo-grid-column field="ManufacturerName" title="Manufacturer" width=""> </kendo-grid-column>
+              <kendo-grid-column field="TradeName" title="Trade Name" width=""> </kendo-grid-column>
+              <kendo-grid-column field="Concentration" title="Concentration (%)" width=""> </kendo-grid-column>
+              <div *kendoGridDetailTemplate="let dataItem">
+                <div class="height-vh"> 
+                <kendo-grid class="k-grid-custom k-grid-custom-child"  [data]="dataItem.FormulationRawMaterialSubComponents" [height]="" [navigable]="true"
+                  kendoGridFocusable>
+                  <kendo-grid-column field="SubComponentName" title="Sub-component Name" width="">
+                  </kendo-grid-column>
+                  <kendo-grid-column field="FuntionName" title="Functions" width=""> </kendo-grid-column>
+                  <kendo-grid-column field="CASNumber" title="CAS Number" width="">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                      <input type="text"  appInputTrim class="form-control" name="RegulationValue" [(ngModel)]="dataItem.CASNumber" required maxlength="50"
+                        placeholder="" [disabled]="!isSendforReview">
+                    </ng-template>
+                  </kendo-grid-column>
+                  <kendo-grid-column field="ECNumberOrKENumber" title="EC Number or KE Number"
+                    width="">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                      <input type="text"  appInputTrim class="form-control" name="RegulationValue" maxlength="50"
+                        [(ngModel)]="dataItem.ECNumberOrKENumber" placeholder="" [disabled]="!isSendforReview">
+                    </ng-template>
+                  </kendo-grid-column>
+                  <kendo-grid-column field="Concentration" title="Concentration (%) (of Sub- Component in the finished Product)" width="">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                      <input type="number" appInputTrim class="form-control" name="RegulationValue"
+
+                      (keyup)="NumberTypeValidation($event,dataItem)"
+                      required [(ngModel)]="dataItem.Concentration" placeholder="" [disabled]="!isSendforReview">
+                    </ng-template>
+                  </kendo-grid-column>
+                  <kendo-grid-column field="EUINCIName" title="EU INCI Name" width="">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                      <input type="text"  appInputTrim class="form-control" name="RegulationValue" [(ngModel)]="dataItem.EUINCIName"
+                        placeholder="" maxlength="50" [disabled]="!isSendforReview" >
+                    </ng-template>
+                  </kendo-grid-column>
+                  <kendo-grid-column field="USINCIName" title="US INCI Name" width="">
+                    <ng-template kendoGridCellTemplate let-dataItem let-rowIndex="rowIndex" let-column="column">
+                      <input type="text"  appInputTrim class="form-control" name="RegulationValue" [(ngModel)]="dataItem.USINCIName"
+                        placeholder="" maxlength="50" [disabled]="!isSendforReview">
+                    </ng-template>
+                  </kendo-grid-column>
+                  <kendo-grid-column field="Impurity" title="Impurity?" width=""> </kendo-grid-column>
+                  <kendo-grid-column title="View Market Regulations" width="">
+                    <ng-template kendoGridCellTemplate let-dataItem>
+                      <div class="k-grid-action-list">
+                        <button aria-label="View" data-balloon-pos="left" class="btn btn-sm btn-light"
+                           (click)="ViewRegulationMarkets(MarketRegulation,dataItem)">
+                          <span class="fa-view"></span></button>
+                      </div>
+                    </ng-template>
+                  </kendo-grid-column>
+                </kendo-grid>
+              </div>
+            </div>
+            </kendo-grid>
+            </div>
+          </div>
+          <div class="modal-footer p-0">
+            <button type="submit" class="btn btn-outline-primary btn-radius" [disabled]="!isSendforReview"
+              *ngIf="rmmapi.getRolePrivilege('ST')" (click)="SendforReview('FSS')"> Send for Review</button>
+            <button type="submit" class="btn btn-outline-primary btn-radius" [disabled]="!isApproveTranscript"
+              *ngIf="rmmapi.getRolePrivilege('RT')" (click)="SendforReview('FSA')">Approve Summary</button>
+            <button type="submit" class="btn btn-outline-primary btn-radius" (click)="SaveTranscript(ValidationMessagePopUp)"
+              *ngIf="rmmapi.getRolePrivilege('MF')" [disabled]="isSaveTranscript || formulationSummuryList.length == 0"> Save
+              Summary </button>
+          
+          </div>
+        </div>
+         
+      </div>
+    </div>
+    </div>
+    </div>
+    <ng-template #MarketRegulation let-modal>
+      <div class="modal-header">
+        <h5 class="modal-title" id="modal-basic-title">Market Regulations</h5>
+        <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-2 p-0 side_nav_pills_section">
+            <div class="sub-menu-nav">
+              <div class="nav flex-column nav-pills" id="v-pills-tab" role="tablist" aria-orientation="vertical">
+                <a *ngFor="let item of formulationMarketList; index as i" class="nav-link nav_a"
+                  [class]="i == 0 ? 'active' : ''" id="v-pills-home-tab" data-toggle="pill" href="#v-pills-home"
+                  role="tab" aria-controls="v-pills-home" aria-selected="true"
+                  (click)="MarketChange(item)">{{item.MarketName}}</a>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-10">
+            <div class="tab-content" id="v-pills-tabContent">
+              <kendo-grid class="k-grid-custom" [data]="formulationMarketRegulationList" [height]="400">
+                <kendo-grid-column field="RegulationName" title="Regulation" width=""> </kendo-grid-column>
+                <kendo-grid-column field="RegulationValue" title="Status" width=""></kendo-grid-column>
+              </kendo-grid>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-outline-light btn-radius"
+          (click)="modal.dismiss('Cross click')">Cancel</button>
+      </div>
+    </ng-template>
+
+    <ng-template #ValidationMessagePopUp let-modal>
+      <div class="modal-body modal-body-sm">
+          <div class="text-center">
+              <!-- <div class="avatar-md">
+                  <div class="avatar-title">
+                      <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                  </div>
+              </div> -->
+              <div class="row justify-content-center">
+                  <h6> Please provide valid CAS Number.</h6>
+              </div>
+          </div>
+      </div>
+      <div class="modal-footer">
+          <button type="button" class="btn btn-primary btn-no btn-radius"
+              (click)="modal.dismiss('Cross click')">Ok</button>
+          <!-- <button type="button" class="btn btn-outline-light btn-radius" (click)="DeleteRawMaterialInfo()">Yes</button> -->
+      </div>
+  </ng-template>
+
+  </div>
+</div>

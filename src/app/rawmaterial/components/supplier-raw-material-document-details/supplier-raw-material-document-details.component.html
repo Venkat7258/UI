@@ -1,0 +1,310 @@
+<div class="row">
+  <div class="col">
+    <div class="content-grid">
+      <div class="formulation-card-body-vh">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex bd-highlight page_title_section">
+              <div class="bd-highlight flex-left">
+                <span> <em> Document Details </em> </span>
+              </div>
+              <div class="flex-grow-1 bd-highlight flex-left">
+                <span> </span>
+              </div>
+              <div class="bd-highlight">
+                <button type="button" *ngIf="this.rmmapi.getRolePrivilege('MRM')" class="btn btn-primary btn-radius"
+                  (click)="SupplierRawMaterialDocumentDetailsModal(SupplierRawMaterialDocumentDetails, 'SupplierRawMaterialDocumentDetailsModal')">
+                  <i class="fa fa-plus"> </i> Document
+                </button>
+                <button type="button" class="btn btn-outline-primary btn-radius m-l-10" (click)="GoToCheckList()"> <i
+                    _ngcontent-rqa-c475="" class="fa fa-long-arrow-right"></i> Next
+                </button>
+              </div>
+            </div>
+
+            <ng-template #template let-anchor>
+              <span>{{ anchor.nativeElement.innerText }}</span>
+            </ng-template>
+            <div kendoTooltip showOn="none" [tooltipTemplate]="template" filter=".k-grid td"
+              (mouseover)="showTooltip($event)">
+              <kendo-grid class="k-grid-custom" [data]="supplierRawMaterialDocumentDetailsinfo" [height]="" [pageable]="{
+                              buttonCount: this.searchFilter.buttonCount,
+                              info: true,
+                              type: 'numeric',
+                              pageSizes: true,
+                              previousNext: true,
+                  position: 'bottom' }" [pageSize]="searchFilter.pageSize" [skip]="searchFilter.pageSkip"
+                [sortable]="{ allowUnsort: false, mode: 'single'}" [sort]="sort" (sortChange)="sortChange($event)"
+                (pageChange)="pageChange($event)">
+
+
+                <kendo-grid-column field="DocumentTypeName" title="Type" width=""> </kendo-grid-column>
+                <kendo-grid-column field="Name" title="Name" width=""></kendo-grid-column>
+                <kendo-grid-column field="BatchNumber" title="Batch Number" width=""></kendo-grid-column>
+                <kendo-grid-column field="EffectiveDate" title="Effective Date" width="">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    {{dataItem.EffectiveDate | date: 'MMMM d, y'}}
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="Validity" title="Validity (Years)" width="">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+
+                    <div *ngIf="dataItem.Validity === 11">No Expiry </div>
+                   
+                    <div *ngIf="dataItem.Validity !== 11 && dataItem.Validity !==0">{{dataItem.Validity }}</div>
+
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column field="FileName" title="Link/ File" width="">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    <span class="unselectable cursorPointer" (click)="DonwloadFile(dataItem.FileName)"
+                      *ngIf="dataItem.FilePath !== '' " target="_blank">{{dataItem.FileName}}</span>
+                    <a class="unselectable cursorPointer" *ngIf="dataItem.FilePath === '' " target="_blank"
+                      [href]="dataItem.rDMSUrl">{{dataItem.rDMSUrl}} </a>
+                  </ng-template>
+                </kendo-grid-column>
+                <kendo-grid-column title="Actions" width="90">
+                  <ng-template kendoGridCellTemplate let-dataItem>
+                    <div class="k-grid-action-list">
+                      <button aria-label="Edit" data-balloon-pos="left" class="btn btn-sm btn-light "
+                        (click)="EditSupplierRawMaterialDocumentDetailsInfo(SupplierRawMaterialDocumentDetails,dataItem, 'SupplierRawMaterialDocumentDetails')">
+                        <span class="fa-edit"></span></button>
+                      <button aria-label="Remove" data-balloon-pos="left" *ngIf="rmmapi.getRolePrivilege('IRM')"
+                        class="btn btn-sm btn-light btn-light-danger "
+                        (click)="InActiveModalInfo(InActiveModal,dataItem, 'InActiveModal')"><span
+                          class="fa-trash"></span></button>
+                    </div>
+                  </ng-template>
+                </kendo-grid-column>
+              </kendo-grid>
+            </div>
+            <ng-template #SupplierRawMaterialDocumentDetails let-modal>
+              <div class="modal-header" id="SupplierRawMaterialDocumentDetailsDiv">
+                <h5 class="modal-title" id="modal-basic-title">{{ actionType ? 'Add Document' :"Edit Document" }}</h5>
+                <button type="button" class="close" aria-label="Close" (click)="modal.dismiss('Cross click')">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+
+              <form #SupplierRawMaterialDocumentDetailsform="ngForm" novalidate
+                (ngSubmit)="SupplierRawMaterialDocumentDetailsform.form.valid && AddSupplierRawMaterialDocumentDetailsInfo(SupplierRawMaterialDocumentDetailsform.value,ConfirmationOnUrlFileChange,'ConfirmationOnUrlFileChange')">
+                <div>
+                  <div class="modal-body ">
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="HealthAuthority"> <span><em> Document Type <span
+                                    class="mandatory"></span></em></span></label>
+                          </div>
+                          <kendo-dropdownlist name="DocumentType" class="kendo_custom_dropdown"
+                            [readonly]='!AccessToMRM' [data]="documentTypeList" textField="DocumentType"
+                            [defaultItem]="defaultItem" valueField="Id" [valuePrimitive]="true"
+                            [(ngModel)]="supplierRawMaterialDocumentDetailsModel.DocumentTypeId" #DocumentType="ngModel"
+                            [ngClass]="{ 'is-invalid ng-invalid ng-touched': SupplierRawMaterialDocumentDetailsform.submitted && DocumentType.invalid }"
+                            required>
+                          </kendo-dropdownlist>
+                          <div *ngIf="SupplierRawMaterialDocumentDetailsform.submitted && DocumentType.invalid"
+                            class="invalid-feedback">
+                            <div *ngIf="DocumentType.errors.required">
+                              {{env.ValidationMessages.requiredRMDocumentDetailsMsg}}</div>
+                          </div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="SupplierRawMaterialDocumentDetailsName"><span><em>Document Name <span
+                                    class="mandatory"></span> </em></span></label>
+                          </div>
+                          <input type="text" appInputTrim class="form-control"
+                            name="SupplierRawMaterialDocumentDetailsName" [readonly]='!AccessToMRM'
+                            [(ngModel)]="supplierRawMaterialDocumentDetailsModel.Name" placeholder="" maxlength="100"
+                            #SupplierRawMaterialDocumentDetailsName="ngModel"
+                            [ngClass]="{ 'is-invalid': SupplierRawMaterialDocumentDetailsform.submitted && SupplierRawMaterialDocumentDetailsName.invalid }"
+                            required (blur)="IsCheckSupplierRawMaterialDocumentDetailsInfo()">
+                          <div
+                            *ngIf="SupplierRawMaterialDocumentDetailsform.submitted && SupplierRawMaterialDocumentDetailsName.invalid"
+                            class="invalid-feedback">
+                            <div *ngIf="SupplierRawMaterialDocumentDetailsName.errors.required">
+                              {{env.ValidationMessages.requiredRMDocumentDetailsMsg}}
+                            </div>
+                          </div>
+                          <div class="invalid-feedback" *ngIf="IsCheckSupplierRawMaterialDocumentDetails">
+                            {{this.env.ValidationMessages.Thisvaluealreadyexists}}</div>
+                        </div>
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="SupplierRawMaterialDocumentDetailsName">
+                              <span><em>Document Effective Date</em></span></label>
+                          </div>
+                          <kendo-datepicker name="EffectiveDate" #EffectiveDate class="" format="dd/MMM/yyyy"
+                          [readonly]='!AccessToMRM' (valueChange)="OnDocumentValidityChange($event)" 
+                          [(ngModel)]="supplierRawMaterialDocumentDetailsModel.EffectiveDate">
+                          </kendo-datepicker>
+                         
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="combo-label">
+
+                            <label for="HealthAuthority"> <span><em> Document Validity (Years) </em></span></label>
+                          </div>
+                          <kendo-dropdownlist name="DocumentValidity" class="kendo_custom_dropdown"
+                            [readonly]='!AccessToMRM' [data]="documentValidityList" textField="Name"
+                            [defaultItem]="defaultItemValidity" valueField="Id" [valuePrimitive]="true"
+                            (valueChange)="OnDocumentValidityChange($event)"
+                            [(ngModel)]="supplierRawMaterialDocumentDetailsModel.Validity" #DocumentValidity="ngModel"
+                            >
+                          </kendo-dropdownlist>
+                         
+                        </div>
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="ExpiryDate"><span><em>Expiry Date</em> </span></label>
+                          </div>
+                          <input type="text" appInputTrim class="form-control" style="pointer-events: none;"
+                            name="ExpiryDate" [readonly]='!AccessToMRM || IsNoExpiryEnabled' format="dd/MMM/yyyy"
+                            [(ngModel)]="supplierRawMaterialDocumentDetailsModel.ExpiryDate" placeholder=""
+                            #ExpiryDate="ngModel">
+                        </div>
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="HealthAuthority"> <span><em>Batch Number </em></span></label>
+                          </div>
+                          <input type="text" appInputTrim class="form-control" name="BatchNumber" maxlength="50"
+                            [readonly]='!AccessToMRM' [(ngModel)]="supplierRawMaterialDocumentDetailsModel.BatchNumber"
+                            placeholder="" #BatchNumber="ngModel">
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="form-check form-check-inline m-l-20">
+                            <div class="grid-check-box-actions">
+                              <input class="form-check-input form-check-custom" type="checkbox" #DMSURLCheckBoxElem
+                                [disabled]='!AccessToMRM' [checked]="IsEnablerDMSURL"
+                                (change)="SelectrDMSURL($event,ConfirmationOnUrlFileChange,'ConfirmationOnUrlFileChange')"
+                                id="DMSURLCheckBoxElement" [value]="IsEnablerDMSURL">
+                              <label class="form-check-label" for="inlineCheckbox1"> <span> <em>DMS URL</em>
+                                </span></label>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <div class="row">
+                        <div class="col-md-4">
+                          <div class="combo-label">
+                            <label for="HealthAuthority"><span><em>Provide DMS URL</em></span></label>
+                          </div>
+                          <input type="url" class="form-control" name="rDMSUrl" placeholder="URL without http or https"
+                            [disabled]="!AccessToMRM || !IsEnablerDMSURL"
+                            [(ngModel)]="supplierRawMaterialDocumentDetailsModel.rDMSUrl" placeholder=""
+                            #rDMSUrl="ngModel"
+                            [ngClass]="{ 'is-invalid': SupplierRawMaterialDocumentDetailsform.submitted && InvalidUrl }"
+                            maxlength="500" required>
+                          <div *ngIf="SupplierRawMaterialDocumentDetailsform.submitted && rDMSUrl.invalid"
+                            class="invalid-feedback">
+                            <div *ngIf="rDMSUrl.errors.required">{{env.ValidationMessages.requiredRMDocumentDetailsMsg}}
+                            </div>
+                          </div>
+                          <div *ngIf="InvalidUrl" class="invalid-feedback"> Please provide valid DMS url </div>
+                        </div>
+                        <div class="col-md-8">
+                          <div class="combo-label">
+                            <label for="ExpiryDate">
+                              <span>
+                                <em> Upload Document
+                                  <span class="mandatory"> </span>
+                                </em>
+                                <em class="ml-2"> (Only docx, doc, pdf, xls & xlsx)</em>
+                              </span>
+                            </label>
+                          </div>
+                          <!-- <input type="file" (change)="UploadImage1($event)" /> -->
+                          <kendo-upload required name="myUpload" #myUpload="ngModel"
+                            [disabled]="!AccessToMRM || IsEnablerDMSURL" [saveUrl]="uploadSaveUrl"
+                            [removeUrl]="uploadRemoveUrl" (upload)="UploadImage1($event)"
+                            [restrictions]="myRestrictions" [(ngModel)]="myFiles"
+                            [ngClass]="{ 'is-invalid ng-invalid ng-touched': SupplierRawMaterialDocumentDetailsform.submitted && myUpload.invalid }">
+                          </kendo-upload>
+
+                          <div *ngIf="SupplierRawMaterialDocumentDetailsform.submitted && myUpload.invalid"
+                            class="invalid-feedback">
+                            <div *ngIf="myUpload.errors.required">
+                              {{env.ValidationMessages.requiredRMDocumentDetailsMsg}}</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button type="button" (click)="CancelDocumentUpdate(modal)"
+                      class="btn btn-outline-light btn-radius">Cancel</button>
+                    <button type="submit" class="btn btn-primary btn-radius" *ngIf="rmmapi.getRolePrivilege('MRM')">{{ actionType ?
+                      'Save' :"Update"}}</button>
+                  </div>
+                </div>
+                <!-- <div *ngIf="isLoading" class="k-i-loading"></div> -->
+              </form>
+            </ng-template>
+            <ng-template #InActiveModal let-modal>
+              <div>
+                <div class="modal-body modal-body-sm">
+                  <div class="text-center">
+                    <div class="avatar-md">
+                      <div class="avatar-title">
+                        <img class="inacive" src="../../../assets/img/bin.svg" width="50">
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <h6> Are you sure you want to delete this document?</h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" 
+                    (click)="modal.dismiss('Cross click')"  class="btn btn-outline-light btn-radius" >No</button>
+                  <button type="button" class="btn btn-primary btn-radius"
+                    (click)="DeleteSupplierRawMaterialDocumentDetailsInfo()">Yes</button>
+                </div>
+              </div>
+              <!-- <div *ngIf="isLoading" class="k-i-loading"></div> -->
+            </ng-template>
+
+            <ng-template #ConfirmationOnUrlFileChange let-modal>
+              <div>
+                <div class="modal-body modal-body-sm">
+                  <div class="text-center">
+                    <div class="avatar-md">
+                      <div class="avatar-title">
+                        <img class="inacive" src="../../../assets/img/ban.svg" width="50">
+                      </div>
+                    </div>
+                    <div class="row justify-content-center">
+                      <h6>
+                        Previously added DMS URL/ document file will be deleted. Are you sure you want to continue?
+                      </h6>
+                    </div>
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary btn-radius btn-no"
+                    (click)="CancelTheFileUrlChange('Cross click')">No</button>
+                  <button type="button" class="btn btn-outline-light btn-radius"
+                    (click)="OnChangeConfirmationOnUrlFile()">Yes</button>
+                </div>
+              </div>
+              <!-- <div *ngIf="isLoading" class="k-i-loading"></div> -->
+            </ng-template>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

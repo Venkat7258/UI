@@ -1,0 +1,259 @@
+@function map-get-value($map, $key) {
+    @if map-has-key($map, $key) {
+        @return map-get($map, $key);
+    } @else {
+        @error "ERROR: Specified key #{$key} does not exist in the mapping #{map-get($map,name)}";
+    }
+}
+
+@mixin set-theme($map) {
+    background-color: map-get-value($map, background-color) !important;
+    color: map-get-value($map, text-color) !important;
+    .sidebar-header {
+        background-color: map-get-value($map, background-color) !important;
+    }
+    // .tab-content {
+    //     background-color: map-get-value($map, background-color) !important;
+    // }
+    nav {
+        ul li {
+            a {
+                color: darken(map-get-value($map, text-color), 25%) !important;
+                &.active {
+                    background-color: map-get-value($map, hover-color) !important;
+                    color: map-get-value($map, active-color) !important;
+                }
+                &:hover {
+                    color: map-get-value($map, text-color) !important;
+                }
+            }
+        }
+    }
+    .code {
+        color: map-get-value($map, code-color);
+    }
+    p {
+        color: map-get-value($map, text-color);
+    }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+        color: map-get-value($map, text-color);
+    }
+
+    .sidebar {
+        // .sidebar-header {
+        //     background-color: map-get-value($map, code-color) !important;
+        // }
+        .sub-menu {
+            li a.active {
+                color: map-get-value($map, active-color) !important;
+            }
+
+            a {
+                &:active {
+                    color: map-get-value($map, active-color) !important;
+                }
+                &:hover {
+                    color: map-get-value($map, active-color) !important;
+                }
+            }
+        }
+    }
+    .sidebar .sidebar-menu li a.active {
+        color: map-get-value($map, active-color) !important;
+        background-color: map-get-value($map, sidebar-color) !important;
+    }
+    .sidebar .sidebar-menu li :hover {
+        color: map-get-value($map, active-color) !important;
+    }
+
+    .button {
+        background-color: map-get-value($map, button-color) !important;
+        color: map-get-value($map, button-text-color) !important;
+    }
+    .btn-primary {
+        background-color: map-get-value($map, button-color) !important;
+        color: map-get-value($map, button-text-color) !important;
+        border-color: map-get-value($map, active-color) !important;
+    }
+    .btn-primary.disabled, .btn-primary:disabled {
+        background-color: map-get-value($map, button-bg-disable) !important;
+        border: map-get-value($map, button-border-disable) !important;
+        color: map-get-value($map, button-text-color-disable) !important;
+    }
+    .btn-outline-primary {
+        color: map-get-value($map, code-color) !important;
+        border-color: map-get-value($map, button-color) !important;
+    }
+    .btn-outline-primary:hover {
+        background-color: map-get-value($map, button-color) !important;
+        color: map-get-value($map, button-text-color) !important;
+    }
+  
+    .btn-outline-primary:disabled {
+        background-color: map-get-value($map, button-bg-disable) !important;
+        border: map-get-value($map, button-border-disable) !important;
+        color: map-get-value($map, button-text-color-disable) !important;
+    }
+    
+    .dropdown-item.active, .dropdown-item:active {
+        background-color: map-get-value($map, button-color) !important;
+        color: map-get-value($map, button-text-color) !important;
+    }
+    .btn-outline-light:not(:disabled):not(.disabled):active, 
+    .btn-outline-light:not(:disabled):not(.disabled).active, 
+    .show > .btn-outline-light.dropdown-toggle {
+        color: #283252;
+        background-color: #f5f6fa;
+        border-color: #ced4da;
+    }
+    .k-multiselect.k-state-focused > .k-multiselect-wrap, .k-state-focused.k-dropdowntree .k-multiselect-wrap {
+        border-color:map-get-value($map, active-color) !important;
+    }
+
+    
+    .k-grid-custom .k-grid-header .k-i-sort-asc-sm, .k-grid-custom .k-grid-header .k-i-sort-desc-sm, .k-grid-custom .k-grid-header .k-sort-order {
+        color: map-get-value($map, active-color) !important;
+    }
+    .k-pager-wrap:focus, .k-state-focused {
+        border-color:map-get-value($map, active-color) !important;
+    }
+    .k-list .k-item:hover {
+        color: map-get-value($map, active-color) !important;
+    }
+    .k-list .k-item:active {
+        color: map-get-value($map, active-color) !important;
+    }
+    .k-state-selected.k-state-focused {
+        color: map-get-value($map, active-color) !important;
+    }
+    .login-body {
+        .login-wrapper {
+            .panel {
+                // .login-content {
+                //     background-color: map-get-value($map, sidebar-color) !important;
+                // }
+                .login-form {
+                    .login-fields {
+                        a {
+                            &:hover {
+                                color: map-get-value($map, active-color) !important;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+    .k-i-loading {
+        color: map-get-value($map, active-color) !important;
+      }
+      .form-control:focus {
+        border-color: map-get-value($map, active-color) !important;
+    }
+
+    .forgot-body {
+        .login-wrapper {
+            .panel {
+                // .login-content {
+                //     background-color: map-get-value($map, sidebar-color) !important;
+                // }
+                .login-form {
+                    .login-fields {
+                        .forgot {
+                            a {
+                                &:hover {
+                                    color: map-get-value($map, active-color) !important;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    .content-panel {
+        nav {
+            .breadcrumb {
+                li.breadcrumb-item {
+                    a {
+                        color: map-get-value($map, active-color) !important;
+                    }
+                }
+            }
+        }
+        .nav-tabs .nav-link.active,
+        .nav-tabs .nav-item.show .nav-link {
+            color: map-get-value($map, active-color) !important;
+        }
+    }
+    .nav-pills .nav-link.active,
+    .nav-pills .show > .nav-link {
+        color: map-get-value($map, active-color) !important;
+    }
+    .page_title_section {
+        .bd-highlight {
+            a {
+                color: map-get-value($map, active-color) !important;
+            }
+        }
+    }
+    .k-grid-custom .k-pager-wrap .k-pager-numbers .k-link.k-state-selected {
+        background-color: map-get-value($map, button-color) !important;
+        color: map-get-value($map, button-text-color) !important;
+        border-color: map-get-value($map, active-color) !important;
+    }
+    .k-grid-custom .k-pager-wrap .k-pager-numbers .k-link:hover,
+    .k-grid-custom .k-pager-wrap .k-pager-numbers .k-link.k-state-hover {
+        color: map-get-value($map, active-color) !important;
+    }
+    .k-grid-custom .k-pager-wrap .k-pager-nav.k-link:hover,
+    .k-grid-custom .k-pager-wrap .k-pager-refresh:hover,
+    .k-grid-custom .k-pager-wrap .k-state-hover.k-pager-nav.k-link,
+    .k-grid-custom .k-pager-wrap .k-state-hover.k-pager-refresh {
+        color: map-get-value($map, active-color) !important;
+    }
+    .k-grid-custom .k-grid-content tr > td .k-grid-action-list .btn-light-danger {
+        color: map-get-value($map, active-color) !important;
+    }
+    .k-grid-custom .k-grid-content tr > td .k-grid-action-list .btn-light-danger:hover {
+        background-color: map-get-value($map, hover-color) !important;
+    }
+    .k-grid-custom .k-grid-content tr > td .k-grid-action-list .btn-light:hover {
+        color: map-get-value($map, active-color) !important;
+    }
+    span.comments {
+        background-color: map-get-value($map, button-color) !important;
+    }
+    .k-treeview .k-in.k-state-selected {
+        color: map-get-value($map, active-color) !important;
+        background-color: map-get-value($map, background-color) !important;
+      }
+      a.copy {
+        color: map-get-value($map, active-color) !important;   
+      }
+      .btn-link {
+        color: map-get-value($map, active-color) !important;
+    }
+}
+
+//set theme
+.dark {
+    @include set-theme($dark-value-map);
+}
+
+.blue {
+    @include set-theme($blue-value-map);
+}
+
+.green {
+    @include set-theme($green-value-map);
+}
+.light {
+    @include set-theme($light-value-map);
+}
